@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="parchment">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>4th Step Moral Inventory — Alcoholics Anonymous (four.kevns.com)</title>
+  <meta name="description" content="A private, fearless, and spiritually grounded 4th Step Moral Inventory application based strictly on Chapter 5 of the book Alcoholics Anonymous (pp. 64-71).">
+  <meta name="theme-color" content="#2b4c33">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="4th Step">
+
+  <!-- PWA Manifest & Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Typography: Lora & Inter for timeless literary elegance and crisp UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/print.css" media="print">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <span class="brand-icon" title="Freedom & Direction">🧭</span>
+        <div>
+          <h1 class="brand-title">4th Step Moral Inventory</h1>
+          <div class="brand-subtitle">Alcoholics Anonymous • Chapter 5: "How It Works" (pp. 64–71) • four.kevns.com</div>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- Audio & Meditation Controls -->
+        <button class="btn btn-secondary btn-sm" id="btnBellChime" title="Ring Tibetan Singing Bowl (432Hz)">
+          🔔 Chime
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btnToggleAmbient" title="Toggle Calming Ambient Sound">
+          🎵 Ambient Calm
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btnOpenTimer" title="Quiet Contemplation Timer">
+          ⏳ Timer
+        </button>
+
+        <span class="header-divider"></span>
+
+        <!-- Security & Privacy Controls -->
+        <button class="btn btn-secondary btn-sm" id="btnPrivacyShield" title="Instantly hide inventory screen (Press Esc)">
+          🛡️ Privacy Shield <kbd class="kbd-hint">Esc</kbd>
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btnLockApp" title="Passcode Lock & AES Encryption">
+          🔒 Lock
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btnExportOptions" title="Backup or Export (Markdown, CSV, JSON)">
+          💾 Export
+        </button>
+
+        <!-- Theme Selector -->
+        <select id="themeSelect" class="form-control form-control-sm theme-select" title="Change Visual Palette">
+          <option value="parchment">📜 Sacred Parchment</option>
+          <option value="midnight">🌙 Midnight Slate</option>
+          <option value="sanctuary">🌲 Sanctuary Pine</option>
+          <option value="pearl">🕊️ Minimalist Pearl</option>
+        </select>
+
+        <button class="btn btn-outline btn-sm" id="btnSettings" title="Privacy Settings & Data Management">
+          ⚙️
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs-bar" aria-label="Inventory Sections">
+    <div class="nav-tabs-inner">
+      <button class="nav-tab active" data-tab="resentments">
+        <span>⚡ 1. Resentments (4 Columns)</span>
+        <span class="tab-badge" id="badgeResentments">0</span>
+      </button>
+      <button class="nav-tab" data-tab="fears">
+        <span>🕊️ 2. Fears Inventory</span>
+        <span class="tab-badge" id="badgeFears">0</span>
+      </button>
+      <button class="nav-tab" data-tab="sexConduct">
+        <span>🤝 3. Sex Conduct & Relations</span>
+        <span class="tab-badge" id="badgeSexConduct">0</span>
+      </button>
+      <button class="nav-tab" data-tab="harms">
+        <span>⚖️ 4. Harms to Others</span>
+        <span class="tab-badge" id="badgeHarms">0</span>
+      </button>
+      <button class="nav-tab" data-tab="prayerTracker">
+        <span>🕯️ 14-Day Prayer Tracker</span>
+        <span class="tab-badge" id="badgePrayerTracker">0</span>
+      </button>
+      <button class="nav-tab" data-tab="patterns">
+        <span>📊 Patterns & Assets</span>
+      </button>
+      <button class="nav-tab" data-tab="step5">
+        <span>📖 Step 5 Sponsor Suite</span>
+      </button>
+      <button class="nav-tab" data-tab="guide">
+        <span>📜 Big Book Reference</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main View Containers -->
+  <main class="app-main">
+
+    <!-- TAB 1: RESENTMENTS (4 COLUMNS) -->
+    <section class="tab-content active" id="tab-resentments">
+      <div class="section-intro-banner">
+        <div class="banner-badge">Step 4 Core Process</div>
+        <h3>Resentment Inventory — The Four Columns (pp. 64–67)</h3>
+        <p>"Resentment is the 'number one' offender. It destroys more alcoholics than anything else... In dealing with resentments, we set them on paper. We listed people, institutions or principles with whom we were angry." Disregard what others have done and resolutely search for your own mistakes in Column 4.</p>
+      </div>
+
+      <div id="resentmentsList"></div>
+    </section>
+
+    <!-- TAB 2: FEARS -->
+    <section class="tab-content" id="tab-fears">
+      <div class="section-intro-banner">
+        <div class="banner-badge">Freedom From Fear</div>
+        <h3>Fear Inventory — Reviewing Our Fears (pp. 67–68)</h3>
+        <p>"We reviewed our fears thoroughly. We put them on paper, even though we had no resentment in connection with them. We asked ourselves why we had them. Wasn't it because self-reliance failed us? ... We ask Him to remove our fear and direct our attention to what He would have us be."</p>
+      </div>
+
+      <div id="fearsList"></div>
+    </section>
+
+    <!-- TAB 3: SEX CONDUCT -->
+    <section class="tab-content" id="tab-sexConduct">
+      <div class="section-intro-banner">
+        <div class="banner-badge">Relationship Overhaul</div>
+        <h3>Sex Conduct & Relationships (pp. 68–70)</h3>
+        <p>"Now about sex. Many of us needed an overhauling there. But above all, we tried to be sensible on this subject... We reviewed our own past conduct over the years. We subjected each relation to this test: was it selfish or not? We asked God to mold our ideals and help us to live up to them."</p>
+      </div>
+
+      <div id="sexConductList"></div>
+    </section>
+
+    <!-- TAB 4: HARMS -->
+    <section class="tab-content" id="tab-harms">
+      <div class="section-intro-banner">
+        <div class="banner-badge">Steps 8 & 9 Foundation</div>
+        <h3>Harms to Others — Preparation for Amends</h3>
+        <p>A comprehensive inventory of people or institutions you have damaged, cheated, lied to, or neglected. This forms the foundation for making a list of all persons we had harmed and becoming willing to make amends to them all.</p>
+      </div>
+
+      <div id="harmsList"></div>
+    </section>
+
+    <!-- TAB 5: 14-DAY PRAYER TRACKER -->
+    <section class="tab-content" id="tab-prayerTracker">
+      <div id="prayerTrackerView"></div>
+    </section>
+
+    <!-- TAB 6: PATTERNS & SPIRITUAL ASSETS -->
+    <section class="tab-content" id="tab-patterns">
+      <div class="section-intro-banner">
+        <div class="banner-badge">Spiritual Diagnostics</div>
+        <h3>Defect Patterns & Threatened Instincts Analysis</h3>
+        <p>"Selfishness - self-centeredness! That, we think, is the root of our troubles." Observe the recurring patterns of which instincts (Security, Pride, Pocketbook, Sex, Ambitions) are repeatedly threatened, and which character defects can be transformed into spiritual assets.</p>
+      </div>
+
+      <div id="patternsView"></div>
+    </section>
+
+    <!-- TAB 7: STEP 5 SPONSOR SUITE -->
+    <section class="tab-content" id="tab-step5">
+      <div id="step5View"></div>
+    </section>
+
+    <!-- TAB 8: BIG BOOK GUIDE -->
+    <section class="tab-content" id="tab-guide">
+      <div id="guideView"></div>
+    </section>
+
+  </main>
+
+  <!-- Reusable Modal Window -->
+  <div class="modal-backdrop" id="appModal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modalTitle">Modal Title</h3>
+        <button class="btn-icon" onclick="AppUI.closeModal()" title="Close (Esc)">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Shield Overlay (Panic Screen) -->
+  <div class="privacy-overlay" id="privacyOverlay" title="Click anywhere or press Esc to resume your inventory">
+    <div class="privacy-cover-card">
+      <div class="cover-icon">📓</div>
+      <h2>Daily Notes & Reflections</h2>
+      <p class="cover-sub">Personal writing log and schedule</p>
+      <div class="cover-journal-entry">
+        <div class="journal-date">Today's Entry</div>
+        <p class="journal-line">"Focus on what is right in front of you. Take things one day at a time, practice patience, and treat everyone with kindness and good humor."</p>
+      </div>
+      <button class="btn btn-primary" onclick="AppUI.togglePrivacyShield(false)">Return to Inventory</button>
+      <div class="cover-hint">Protected by AES-256 local encryption • Zero internet transmission</div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/bigbook-data.js"></script>
+  <script src="js/sound-service.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/inventory-forms.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          console.log('ServiceWorker registered for offline use:', reg.scope);
+        }).catch((err) => {
+          console.warn('ServiceWorker registration notice:', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
