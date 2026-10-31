@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>4th Step Moral Inventory — Alcoholics Anonymous (four.kevns.com)</title>
-  <meta name="description" content="A private, fearless, and spiritually grounded 4th Step Moral Inventory application based strictly on Chapter 5 of the book Alcoholics Anonymous (pp. 64-71).">
+  <meta name="description" content="An intuitive, fearless, and spiritually grounded 4th Step Moral Inventory application based strictly on Chapter 5 of the book Alcoholics Anonymous (pp. 64-71).">
   <meta name="theme-color" content="#2b4c33">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,7 +15,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
 
-  <!-- Typography: Lora & Inter for timeless literary elegance and crisp UI -->
+  <!-- Typography: Cinzel for dignified headings, Lora for literary warmth, Inter for UI -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
@@ -25,196 +25,474 @@
 </head>
 <body>
 
-  <!-- App Header -->
+  <!-- =========================================================================
+       APP HEADER: Serene, Dignified & Intuitive
+       ========================================================================= -->
   <header class="app-header">
-    <div class="header-inner">
-      <div class="header-brand">
-        <span class="brand-icon" title="Freedom & Direction">🧭</span>
-        <div>
+    <div class="header-container">
+      <div class="header-brand" onclick="AppUI.switchTab('resentments')" title="Return to Inventory">
+        <span class="brand-compass">🧭</span>
+        <div class="brand-text">
           <h1 class="brand-title">4th Step Moral Inventory</h1>
-          <div class="brand-subtitle">Alcoholics Anonymous • Chapter 5: "How It Works" (pp. 64–71) • four.kevns.com</div>
+          <p class="brand-subtitle">Alcoholics Anonymous • Chapter 5: "How It Works" (pp. 64–71)</p>
         </div>
       </div>
 
-      <div class="header-controls">
-        <!-- Audio & Meditation Controls -->
-        <button class="btn btn-secondary btn-sm" id="btnBellChime" title="Ring Tibetan Singing Bowl (432Hz)">
-          🔔 Chime
-        </button>
-        <button class="btn btn-secondary btn-sm" id="btnToggleAmbient" title="Toggle Calming Ambient Sound">
-          🎵 Ambient Calm
-        </button>
-        <button class="btn btn-secondary btn-sm" id="btnOpenTimer" title="Quiet Contemplation Timer">
-          ⏳ Timer
+      <!-- Center Status: Calm completion tracker -->
+      <div class="header-summary" id="headerSummary" title="Your Current Progress">
+        <span class="summary-pill" id="summaryTotalCount">0 Entries</span>
+        <span class="summary-separator">•</span>
+        <span class="summary-pill summary-success" id="summaryCompletedCount">0 Free</span>
+        <span class="summary-separator">•</span>
+        <span class="summary-pill summary-amber" id="summaryDraftCount">0 In Progress</span>
+      </div>
+
+      <!-- Right Header Actions -->
+      <div class="header-actions">
+        <!-- Floating Zen Sound Pill -->
+        <button class="zen-pill-btn" id="btnZenHub" title="Tibetan Bell, Calming Rain & Timer" aria-label="Open Zen and Meditation Tools">
+          <span class="zen-icon">🔔</span>
+          <span class="zen-label">Zen Tools</span>
+          <span class="zen-indicator" id="ambientIndicator" style="display:none;"></span>
         </button>
 
-        <span class="header-divider"></span>
-
-        <!-- Security & Privacy Controls -->
-        <button class="btn btn-secondary btn-sm" id="btnPrivacyShield" title="Instantly hide inventory screen (Press Esc)">
-          🛡️ Privacy Shield <kbd class="kbd-hint">Esc</kbd>
-        </button>
-        <button class="btn btn-secondary btn-sm" id="btnLockApp" title="Passcode Lock & AES Encryption">
-          🔒 Lock
-        </button>
-        <button class="btn btn-secondary btn-sm" id="btnExportOptions" title="Backup or Export (Markdown, CSV, JSON)">
-          💾 Export
+        <!-- Privacy Panic Shield (<kbd>Esc</kbd>) -->
+        <button class="btn btn-icon-round" id="btnPrivacyShield" title="Instantly hide screen (Press Esc)" aria-label="Privacy Shield">
+          🛡️
         </button>
 
-        <!-- Theme Selector -->
-        <select id="themeSelect" class="form-control form-control-sm theme-select" title="Change Visual Palette">
-          <option value="parchment">📜 Sacred Parchment</option>
-          <option value="midnight">🌙 Midnight Slate</option>
-          <option value="sanctuary">🌲 Sanctuary Pine</option>
-          <option value="pearl">🕊️ Minimalist Pearl</option>
-        </select>
-
-        <button class="btn btn-outline btn-sm" id="btnSettings" title="Privacy Settings & Data Management">
+        <!-- Overflow Menu Trigger -->
+        <button class="btn btn-icon-round" id="btnMoreMenu" title="Themes, Passcode Lock, Export & Guide" aria-label="Preferences and Options">
           ⚙️
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Navigation Tabs -->
-  <nav class="nav-tabs-bar" aria-label="Inventory Sections">
-    <div class="nav-tabs-inner">
-      <button class="nav-tab active" data-tab="resentments">
-        <span>⚡ 1. Resentments (4 Columns)</span>
-        <span class="tab-badge" id="badgeResentments">0</span>
-      </button>
-      <button class="nav-tab" data-tab="fears">
-        <span>🕊️ 2. Fears Inventory</span>
-        <span class="tab-badge" id="badgeFears">0</span>
-      </button>
-      <button class="nav-tab" data-tab="sexConduct">
-        <span>🤝 3. Sex Conduct & Relations</span>
-        <span class="tab-badge" id="badgeSexConduct">0</span>
-      </button>
-      <button class="nav-tab" data-tab="harms">
-        <span>⚖️ 4. Harms to Others</span>
-        <span class="tab-badge" id="badgeHarms">0</span>
-      </button>
-      <button class="nav-tab" data-tab="prayerTracker">
-        <span>🕯️ 14-Day Prayer Tracker</span>
-        <span class="tab-badge" id="badgePrayerTracker">0</span>
-      </button>
-      <button class="nav-tab" data-tab="patterns">
-        <span>📊 Patterns & Assets</span>
-      </button>
-      <button class="nav-tab" data-tab="step5">
-        <span>📖 Step 5 Sponsor Suite</span>
-      </button>
-      <button class="nav-tab" data-tab="guide">
-        <span>📜 Big Book Reference</span>
-      </button>
+  <!-- =========================================================================
+       ZEN TOOLS DROPDOWN / DRAWER
+       ========================================================================= -->
+  <div class="zen-drawer" id="zenDrawer" style="display: none;">
+    <div class="zen-drawer-inner">
+      <div class="zen-drawer-col">
+        <div class="zen-title">🔔 Singing Bowl Chimes</div>
+        <div class="zen-buttons-row">
+          <button class="btn btn-sm btn-outline" onclick="window.soundService.playChime(432); AppUI.showToast('432Hz Heart Chime');">
+            432Hz Bell
+          </button>
+          <button class="btn btn-sm btn-outline" onclick="window.soundService.playChime(528); AppUI.showToast('528Hz Transformation Chime');">
+            528Hz Bell
+          </button>
+        </div>
+      </div>
+
+      <div class="zen-drawer-col">
+        <div class="zen-title">🌧️ Calming Ambient Rain</div>
+        <div class="zen-ambient-control">
+          <button class="btn btn-sm btn-secondary" id="btnToggleAmbient">
+            🎵 Play Rain
+          </button>
+          <input type="range" id="ambientVolume" min="0" max="1" step="0.05" value="0.25" title="Volume" class="volume-slider">
+        </div>
+      </div>
+
+      <div class="zen-drawer-col">
+        <div class="zen-title">⏳ Quiet Contemplation Timer</div>
+        <div class="zen-buttons-row">
+          <button class="btn btn-sm btn-outline" onclick="AppUI.startQuickTimer(3)">3 Min</button>
+          <button class="btn btn-sm btn-outline" onclick="AppUI.startQuickTimer(5)">5 Min</button>
+          <button class="btn btn-sm btn-outline" onclick="AppUI.startQuickTimer(10)">10 Min</button>
+        </div>
+      </div>
+
+      <button class="btn-close-zen" onclick="AppUI.toggleZenDrawer(false)" title="Close Zen Tools">✕</button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       PRIMARY NAVIGATION: 4 Inventories + 2 Sanctuary Spaces
+       ========================================================================= -->
+  <nav class="app-nav" aria-label="Inventory Workspaces">
+    <div class="nav-container">
+      <div class="nav-segment">
+        <button class="nav-pill active" data-tab="resentments">
+          <span class="pill-icon">⚡</span>
+          <span class="pill-name">Resentments</span>
+          <span class="pill-badge" id="badgeResentments">0</span>
+        </button>
+        <button class="nav-pill" data-tab="fears">
+          <span class="pill-icon">🕊️</span>
+          <span class="pill-name">Fears</span>
+          <span class="pill-badge" id="badgeFears">0</span>
+        </button>
+        <button class="nav-pill" data-tab="sexConduct">
+          <span class="pill-icon">🤝</span>
+          <span class="pill-name">Sex & Intimacy</span>
+          <span class="pill-badge" id="badgeSexConduct">0</span>
+        </button>
+        <button class="nav-pill" data-tab="harms">
+          <span class="pill-icon">⚖️</span>
+          <span class="pill-name">Harms to Others</span>
+          <span class="pill-badge" id="badgeHarms">0</span>
+        </button>
+      </div>
+
+      <div class="nav-separator"></div>
+
+      <div class="nav-segment">
+        <button class="nav-pill" data-tab="prayerTracker" title="14-Day Resentment Prayer Practice">
+          <span class="pill-icon">🕯️</span>
+          <span class="pill-name">14-Day Prayer</span>
+          <span class="pill-badge pill-badge-prayer" id="badgePrayerTracker">0</span>
+        </button>
+        <button class="nav-pill" data-tab="step5" title="Step 5 Sponsor Review & Print">
+          <span class="pill-icon">📖</span>
+          <span class="pill-name">Sponsor Suite</span>
+        </button>
+      </div>
     </div>
   </nav>
 
-  <!-- Main View Containers -->
-  <main class="app-main">
+  <!-- =========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================= -->
+  <main class="app-content" id="appMain">
 
-    <!-- TAB 1: RESENTMENTS (4 COLUMNS) -->
-    <section class="tab-content active" id="tab-resentments">
-      <div class="section-intro-banner">
-        <div class="banner-badge">Step 4 Core Process</div>
-        <h3>Resentment Inventory — The Four Columns (pp. 64–67)</h3>
-        <p>"Resentment is the 'number one' offender. It destroys more alcoholics than anything else... In dealing with resentments, we set them on paper. We listed people, institutions or principles with whom we were angry." Disregard what others have done and resolutely search for your own mistakes in Column 4.</p>
+    <!-- TAB 1: RESENTMENTS -->
+    <section class="tab-pane active" id="pane-resentments">
+      <div class="hero-strip">
+        <div class="hero-text">
+          <h2>The Resentment Inventory <span class="hero-cite">— pp. 64–67</span></h2>
+          <p class="hero-quote">
+            "Resentment is the 'number one' offender. It destroys more alcoholics than anything else...
+            Disregard what others have done and resolutely search for your own mistakes."
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="InventoryForms.openResentmentModal()">
+            + Walk Me Through a Resentment
+          </button>
+        </div>
       </div>
 
-      <div id="resentmentsList"></div>
+      <!-- Quick 10-Second Brain Dump Bar (List First, Analyze Later) -->
+      <div class="brain-dump-card">
+        <div class="dump-header">
+          <div class="dump-badge">Step 1: The Master List</div>
+          <h3>Quick Name Brain-Dump <span class="dump-sub">— Got someone on your mind? Get the name down first.</span></h3>
+        </div>
+        <form class="dump-form" onsubmit="AppUI.handleQuickAddResentment(event)">
+          <div class="dump-input-wrap">
+            <span class="dump-prefix">I am angry or hurt at:</span>
+            <input type="text" id="quickAddTarget" class="dump-input" placeholder="e.g. John D., Mom, My Boss, Police, God, Myself..." required autocomplete="off">
+          </div>
+          <button type="submit" class="btn btn-accent btn-dump">
+            + Quick Add
+          </button>
+        </form>
+        <div class="dump-quick-tags">
+          <span class="tag-label">Common prompts:</span>
+          <button type="button" class="quick-chip" onclick="AppUI.fillQuickTarget('Mother')">Mother</button>
+          <button type="button" class="quick-chip" onclick="AppUI.fillQuickTarget('Father')">Father</button>
+          <button type="button" class="quick-chip" onclick="AppUI.fillQuickTarget('Employer / Boss')">Employer / Boss</button>
+          <button type="button" class="quick-chip" onclick="AppUI.fillQuickTarget('Ex-Partner')">Ex-Partner</button>
+          <button type="button" class="quick-chip" onclick="AppUI.fillQuickTarget('Myself')">Myself</button>
+          <button type="button" class="quick-chip" onclick="AppUI.fillQuickTarget('God / Religion')">God / Religion</button>
+        </div>
+      </div>
+
+      <!-- View Controls & Search Bar -->
+      <div class="workspace-toolbar">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="search" id="resSearchInput" class="search-field" placeholder="Search by name, cause, defects, or assets..." oninput="AppUI.handleSearch(event)">
+        </div>
+
+        <div class="filter-controls">
+          <select id="filterCategory" class="select-pill" onchange="AppUI.handleCategoryFilter(event)">
+            <option value="all">All Categories</option>
+            <option value="Person">People</option>
+            <option value="Family Member">Family</option>
+            <option value="Employer / Workplace">Work / Career</option>
+            <option value="Institution / Authority">Institutions</option>
+            <option value="Myself">Myself</option>
+            <option value="Religion / God">God / Religion</option>
+          </select>
+
+          <select id="filterTurnaround" class="select-pill" onchange="AppUI.handleTurnaroundFilter(event)">
+            <option value="all">All States</option>
+            <option value="complete">✓ Turnaround Done</option>
+            <option value="incomplete">⚠️ Turnaround Needed</option>
+            <option value="amends">⚖️ Needs Amends</option>
+            <option value="prayer">🕊️ Praying (14-Day)</option>
+          </select>
+
+          <!-- View Mode Switcher: Cards vs Classic Big Book Ledger -->
+          <div class="view-mode-toggle" role="radiogroup" aria-label="View Layout">
+            <button class="view-btn active" id="btnViewCards" onclick="AppUI.setViewMode('cards')" title="Card Flow Mode">
+              🗂️ Cards
+            </button>
+            <button class="view-btn" id="btnViewLedger" onclick="AppUI.setViewMode('ledger')" title="Classic 4-Column Ledger">
+              📋 4 Columns
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Resentments Container -->
+      <div id="resentmentsViewArea">
+        <!-- Rendered dynamically via AppUI.renderResentments() -->
+      </div>
     </section>
 
     <!-- TAB 2: FEARS -->
-    <section class="tab-content" id="tab-fears">
-      <div class="section-intro-banner">
-        <div class="banner-badge">Freedom From Fear</div>
-        <h3>Fear Inventory — Reviewing Our Fears (pp. 67–68)</h3>
-        <p>"We reviewed our fears thoroughly. We put them on paper, even though we had no resentment in connection with them. We asked ourselves why we had them. Wasn't it because self-reliance failed us? ... We ask Him to remove our fear and direct our attention to what He would have us be."</p>
+    <section class="tab-pane" id="pane-fears">
+      <div class="hero-strip">
+        <div class="hero-text">
+          <h2>The Fear Inventory <span class="hero-cite">— pp. 67–68</span></h2>
+          <p class="hero-quote">
+            "We reviewed our fears thoroughly. We put them on paper, even though we had no resentment in connection with them.
+            We asked ourselves why we had them. Wasn't it because self-reliance failed us?"
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="InventoryForms.openFearModal()">
+            + Add a Fear
+          </button>
+        </div>
       </div>
 
-      <div id="fearsList"></div>
-    </section>
-
-    <!-- TAB 3: SEX CONDUCT -->
-    <section class="tab-content" id="tab-sexConduct">
-      <div class="section-intro-banner">
-        <div class="banner-badge">Relationship Overhaul</div>
-        <h3>Sex Conduct & Relationships (pp. 68–70)</h3>
-        <p>"Now about sex. Many of us needed an overhauling there. But above all, we tried to be sensible on this subject... We reviewed our own past conduct over the years. We subjected each relation to this test: was it selfish or not? We asked God to mold our ideals and help us to live up to them."</p>
+      <!-- Quick Fear Dump -->
+      <div class="brain-dump-card">
+        <div class="dump-header">
+          <div class="dump-badge">Naming the Fear</div>
+          <h3>What are you afraid of? <span class="dump-sub">— Naming it on paper strips away its power.</span></h3>
+        </div>
+        <form class="dump-form" onsubmit="AppUI.handleQuickAddFear(event)">
+          <div class="dump-input-wrap">
+            <span class="dump-prefix">I am afraid of:</span>
+            <input type="text" id="quickAddFearInput" class="dump-input" placeholder="e.g. Poverty, what people think, abandonment, failing, illness..." required autocomplete="off">
+          </div>
+          <button type="submit" class="btn btn-accent btn-dump">
+            + Add Fear
+          </button>
+        </form>
+        <div class="dump-quick-tags">
+          <span class="tag-label">Common fears:</span>
+          <button type="button" class="quick-chip" onclick="AppUI.fillQuickFear('Not having enough money / Financial ruin')">Financial Ruin</button>
+          <button type="button" class="quick-chip" onclick="AppUI.fillQuickFear('Rejection / People judging me')">Rejection & Judgment</button>
+          <button type="button" class="quick-chip" onclick="AppUI.fillQuickFear('Being exposed as a fraud / Failure')">Being Exposed / Failure</button>
+          <button type="button" class="quick-chip" onclick="AppUI.fillQuickFear('Being alone / Abandonment')">Loneliness</button>
+        </div>
       </div>
 
-      <div id="sexConductList"></div>
+      <div id="fearsViewArea">
+        <!-- Injected dynamically -->
+      </div>
     </section>
 
-    <!-- TAB 4: HARMS -->
-    <section class="tab-content" id="tab-harms">
-      <div class="section-intro-banner">
-        <div class="banner-badge">Steps 8 & 9 Foundation</div>
-        <h3>Harms to Others — Preparation for Amends</h3>
-        <p>A comprehensive inventory of people or institutions you have damaged, cheated, lied to, or neglected. This forms the foundation for making a list of all persons we had harmed and becoming willing to make amends to them all.</p>
+    <!-- TAB 3: SEX & INTIMACY -->
+    <section class="tab-pane" id="pane-sexConduct">
+      <div class="hero-strip">
+        <div class="hero-text">
+          <h2>Sex Conduct & Relationships <span class="hero-cite">— pp. 68–70</span></h2>
+          <p class="hero-quote">
+            "We reviewed our own past conduct over the years. Where had we been selfish, dishonest, or inconsiderate?
+            Whom had we hurt? We subjected each relation to this test: was it selfish or not?"
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="InventoryForms.openSexConductModal()">
+            + Add Relationship Review
+          </button>
+        </div>
       </div>
 
-      <div id="harmsList"></div>
+      <div id="sexConductViewArea">
+        <!-- Injected dynamically -->
+      </div>
     </section>
 
-    <!-- TAB 5: 14-DAY PRAYER TRACKER -->
-    <section class="tab-content" id="tab-prayerTracker">
-      <div id="prayerTrackerView"></div>
-    </section>
-
-    <!-- TAB 6: PATTERNS & SPIRITUAL ASSETS -->
-    <section class="tab-content" id="tab-patterns">
-      <div class="section-intro-banner">
-        <div class="banner-badge">Spiritual Diagnostics</div>
-        <h3>Defect Patterns & Threatened Instincts Analysis</h3>
-        <p>"Selfishness - self-centeredness! That, we think, is the root of our troubles." Observe the recurring patterns of which instincts (Security, Pride, Pocketbook, Sex, Ambitions) are repeatedly threatened, and which character defects can be transformed into spiritual assets.</p>
+    <!-- TAB 4: HARMS TO OTHERS -->
+    <section class="tab-pane" id="pane-harms">
+      <div class="hero-strip">
+        <div class="hero-text">
+          <h2>Harms to Others <span class="hero-cite">— Preparing for Steps 8 & 9</span></h2>
+          <p class="hero-quote">
+            "A business which takes no regular inventory usually goes broke. We disclose damaged goods to get rid of them promptly and without regret."
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="InventoryForms.openHarmModal()">
+            + Add Person Harmed
+          </button>
+        </div>
       </div>
 
-      <div id="patternsView"></div>
+      <div id="harmsViewArea">
+        <!-- Injected dynamically -->
+      </div>
     </section>
 
-    <!-- TAB 7: STEP 5 SPONSOR SUITE -->
-    <section class="tab-content" id="tab-step5">
-      <div id="step5View"></div>
+    <!-- TAB 5: 14-DAY PRAYER SANCTUARY -->
+    <section class="tab-pane" id="pane-prayerTracker">
+      <div class="hero-strip hero-strip-prayer">
+        <div class="hero-text">
+          <h2>The 14-Day Freedom Prayer Sanctuary</h2>
+          <p class="hero-quote">
+            "If you have a resentment you want to be free of, pray for the person or thing you resent for 14 days.
+            Ask for everything you want for yourself to be given to them. By the 14th day, you will find your anger has lifted."
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-outline" onclick="window.soundService.playChime(432)">
+            🔔 Ring Bell (432Hz)
+          </button>
+        </div>
+      </div>
+
+      <div id="prayerTrackerArea">
+        <!-- Injected dynamically -->
+      </div>
     </section>
 
-    <!-- TAB 8: BIG BOOK GUIDE -->
-    <section class="tab-content" id="tab-guide">
-      <div id="guideView"></div>
+    <!-- TAB 6: STEP 5 SPONSOR SUITE -->
+    <section class="tab-pane" id="pane-step5">
+      <div class="hero-strip hero-strip-step5">
+        <div class="hero-text">
+          <h2>Step 5: Sharing With Another Person <span class="hero-cite">— pp. 72–75</span></h2>
+          <p class="hero-quote">
+            "Admitted to God, to ourselves, and to another human being the exact nature of our wrongs...
+            We pocket our pride and go to it, illuminating every twist of character, every dark cranny of the past."
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="window.print()">
+            🖨️ Print / Save PDF for Sponsor
+          </button>
+          <button class="btn btn-secondary" id="btnToggleAnonymize" onclick="AppUI.toggleAnonymize()">
+            🕶️ Mask Real Names: OFF
+          </button>
+        </div>
+      </div>
+
+      <div id="step5ViewArea">
+        <!-- Injected dynamically -->
+      </div>
     </section>
 
   </main>
 
-  <!-- Reusable Modal Window -->
-  <div class="modal-backdrop" id="appModal" role="dialog" aria-modal="true">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3 id="modalTitle">Modal Title</h3>
-        <button class="btn-icon" onclick="AppUI.closeModal()" title="Close (Esc)">✕</button>
+  <!-- =========================================================================
+       MODERN NATIVE <dialog> MODAL (Per modern-web-guidance: closedby="any")
+       ========================================================================= -->
+  <dialog id="appDialog" closedby="any" class="modern-dialog" aria-labelledby="dialogTitle">
+    <div class="dialog-card">
+      <div class="dialog-header">
+        <h3 id="dialogTitle" class="dialog-heading">Inventory Form</h3>
+        <button type="button" class="dialog-close-btn" onclick="AppUI.closeModal()" title="Close (Esc)" aria-label="Close dialog">
+          ✕
+        </button>
       </div>
-      <div class="modal-body" id="modalBody">
-        <!-- Injected dynamically -->
+
+      <div class="dialog-body" id="dialogBody">
+        <!-- Injected dynamically by InventoryForms -->
       </div>
     </div>
-  </div>
+  </dialog>
 
-  <!-- Privacy Shield Overlay (Panic Screen) -->
-  <div class="privacy-overlay" id="privacyOverlay" title="Click anywhere or press Esc to resume your inventory">
+  <!-- =========================================================================
+       OVERFLOW SETTINGS & PREFERENCES MODAL
+       ========================================================================= -->
+  <dialog id="preferencesDialog" closedby="any" class="modern-dialog dialog-sm" aria-labelledby="prefsTitle">
+    <div class="dialog-card">
+      <div class="dialog-header">
+        <h3 id="prefsTitle" class="dialog-heading">Preferences & Privacy</h3>
+        <button type="button" class="dialog-close-btn" onclick="document.getElementById('preferencesDialog').close()">✕</button>
+      </div>
+      <div class="dialog-body">
+        <div class="pref-section">
+          <label class="pref-label">Visual Palette / Theme</label>
+          <div class="theme-grid">
+            <button class="theme-tile active" data-theme="parchment" onclick="AppUI.applyTheme('parchment')">
+              <span class="theme-color-preview parchment-preview"></span>
+              <span class="theme-tile-name">Sacred Parchment</span>
+            </button>
+            <button class="theme-tile" data-theme="midnight" onclick="AppUI.applyTheme('midnight')">
+              <span class="theme-color-preview midnight-preview"></span>
+              <span class="theme-tile-name">Midnight Slate</span>
+            </button>
+            <button class="theme-tile" data-theme="sanctuary" onclick="AppUI.applyTheme('sanctuary')">
+              <span class="theme-color-preview sanctuary-preview"></span>
+              <span class="theme-tile-name">Sanctuary Pine</span>
+            </button>
+            <button class="theme-tile" data-theme="pearl" onclick="AppUI.applyTheme('pearl')">
+              <span class="theme-color-preview pearl-preview"></span>
+              <span class="theme-tile-name">Minimalist Pearl</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pref-section">
+          <label class="pref-label">Zero-Knowledge Security</label>
+          <p class="pref-desc">Your inventory is stored only inside your browser. Enable a passcode to encrypt it with Web Crypto AES-256-GCM.</p>
+          <div class="pref-row">
+            <button class="btn btn-secondary btn-sm" onclick="AppUI.openSecuritySettings()">
+              🔒 Manage Passcode & Encryption
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="AppUI.lockNow()">
+              Lock App Now
+            </button>
+          </div>
+        </div>
+
+        <div class="pref-section">
+          <label class="pref-label">Backup & Data Portability</label>
+          <div class="pref-row">
+            <button class="btn btn-outline btn-sm" onclick="window.inventoryStore.exportData('json'); AppUI.showToast('Encrypted JSON backup downloaded.');">
+              💾 Export JSON
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="window.inventoryStore.exportData('markdown'); AppUI.showToast('Readable Markdown exported.');">
+              📄 Export Markdown
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="window.inventoryStore.exportData('csv'); AppUI.showToast('CSV Spreadsheet downloaded.');">
+              📊 Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="pref-section">
+          <label class="pref-label">Big Book Sample Data</label>
+          <p class="pref-desc">Load Bill W.'s original 1939 inventory examples from pages 65–70 to see how it works.</p>
+          <button class="btn btn-outline btn-sm" onclick="window.inventoryStore.loadSampleData(); AppUI.render(); AppUI.showToast('Loaded 1939 Big Book sample data.'); document.getElementById('preferencesDialog').close();">
+            📥 Load Big Book Examples
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- =========================================================================
+       PRIVACY SHIELD OVERLAY (PANIC SCREEN: Hit Esc anytime)
+       ========================================================================= -->
+  <div class="privacy-overlay" id="privacyOverlay" title="Press Esc or click button to return" style="display: none;">
     <div class="privacy-cover-card">
       <div class="cover-icon">📓</div>
-      <h2>Daily Notes & Reflections</h2>
-      <p class="cover-sub">Personal writing log and schedule</p>
+      <h2>Daily Notes & Schedule</h2>
+      <p class="cover-sub">Personal writing log and daily to-do items</p>
       <div class="cover-journal-entry">
-        <div class="journal-date">Today's Entry</div>
-        <p class="journal-line">"Focus on what is right in front of you. Take things one day at a time, practice patience, and treat everyone with kindness and good humor."</p>
+        <div class="journal-date">Today's Focus</div>
+        <p class="journal-line">"Focus on the next right thing. Practice patience with everyone you meet, stay humble, and remember to take things one day at a time."</p>
       </div>
-      <button class="btn btn-primary" onclick="AppUI.togglePrivacyShield(false)">Return to Inventory</button>
-      <div class="cover-hint">Protected by AES-256 local encryption • Zero internet transmission</div>
+      <button class="btn btn-primary" onclick="AppUI.togglePrivacyShield(false)">Return to Work</button>
+      <div class="cover-hint">All data remains locally encrypted on this device • Zero network transmission</div>
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Core Scripts -->
   <script src="js/bigbook-data.js"></script>
   <script src="js/sound-service.js"></script>
   <script src="js/store.js"></script>
@@ -226,9 +504,9 @@
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').then((reg) => {
-          console.log('ServiceWorker registered for offline use:', reg.scope);
+          console.log('PWA ServiceWorker registered:', reg.scope);
         }).catch((err) => {
-          console.warn('ServiceWorker registration notice:', err);
+          console.warn('PWA registration:', err);
         });
       });
     }

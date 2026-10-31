@@ -1,6 +1,6 @@
 /**
  * Print Stylesheet for Step 5 Sponsor Review Packet
- * Designed for crisp 8.5x11 / A4 physical printing or PDF generation
+ * Designed for crisp physical printing or PDF generation
  */
 
 @media print {
@@ -17,150 +17,62 @@
     line-height: 1.4 !important;
   }
 
-  /* Hide all interactive UI */
+  /* Hide interactive controls */
   .app-header,
-  .nav-tabs-bar,
-  .no-print,
-  .table-actions-bar,
+  .app-nav,
+  .zen-drawer,
+  .brain-dump-card,
+  .workspace-toolbar,
   .btn,
-  .btn-icon,
-  .modal-backdrop,
+  .dialog-close-btn,
+  dialog,
   .privacy-overlay,
-  .app-toast,
-  .section-intro-banner {
+  .toast-container,
+  .hero-actions,
+  .header-actions {
     display: none !important;
   }
 
-  /* Show only the Step 5 review container */
-  .app-main {
+  .app-content {
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
   }
 
-  .tab-content {
+  .tab-pane {
     display: none !important;
   }
 
-  #tab-step5 {
+  #pane-step5 {
     display: block !important;
   }
 
-  .sponsor-packet-document {
+  .sponsor-paper {
     border: none !important;
     padding: 0 !important;
     box-shadow: none !important;
     background: transparent !important;
   }
 
-  .packet-cover {
-    page-break-after: always;
-    padding-top: 4cm;
-    text-align: center;
-    border-bottom: none !important;
+  .sponsor-paper h3 {
+    font-size: 18pt !important;
+    border-bottom: 2pt solid #000 !important;
+    margin-bottom: 12pt !important;
   }
 
-  .packet-cover h1 {
-    font-size: 26pt !important;
-    margin-bottom: 12pt;
-  }
-
-  .packet-cover h3 {
-    font-size: 14pt !important;
-    color: #333 !important;
-    margin-bottom: 24pt;
-  }
-
-  .packet-meta {
-    font-size: 11pt !important;
-    color: #111 !important;
-    border-top: 1px solid #777;
-    padding-top: 12pt;
-    display: inline-block;
-  }
-
-  .packet-section {
-    margin-bottom: 2cm !important;
-  }
-
-  .page-break {
-    page-break-before: always;
-  }
-
-  .packet-section h2 {
-    font-size: 14pt !important;
-    border-bottom: 1.5pt solid #000 !important;
-    padding-bottom: 4pt !important;
-    margin-bottom: 10pt !important;
-    color: #000 !important;
-  }
-
-  .packet-table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    page-break-inside: auto;
-  }
-
-  .packet-table tr {
-    page-break-inside: avoid;
-    page-break-after: auto;
-  }
-
-  .packet-table th {
-    background: #f0f0f0 !important;
-    color: #000 !important;
-    font-weight: bold !important;
-    border: 1pt solid #000 !important;
-    padding: 6pt !important;
-    font-size: 9pt !important;
-  }
-
-  .packet-table td {
-    border: 0.75pt solid #555 !important;
-    padding: 6pt !important;
-    font-size: 9pt !important;
-    vertical-align: top !important;
-  }
-
-  .packet-part {
-    margin-top: 4pt;
-    padding-top: 4pt;
-    border-top: 0.5pt dashed #777;
-  }
-
-  .packet-asset {
-    margin-top: 3pt;
-    font-size: 8.5pt;
-    color: #222;
-  }
-
-  .promises-box {
-    border: 1pt solid #444 !important;
-    background: #fafafa !important;
-    padding: 12pt !important;
-    font-style: italic;
-    page-break-inside: avoid;
-  }
-
-  .packet-entry-box {
-    border: 0.75pt solid #555 !important;
+  .sponsor-notes-area {
+    border: 1pt solid #888 !important;
     background: #fff !important;
-    padding: 8pt !important;
-    margin-bottom: 10pt !important;
-    page-break-inside: avoid;
+    color: #000 !important;
+    font-size: 10pt !important;
   }
 
-  .packet-entry-box h4 {
-    font-size: 11pt !important;
-    margin-bottom: 6pt !important;
-    border-bottom: 0.5pt solid #ccc;
-    padding-bottom: 3pt;
+  .ledger-table {
+    border: 1pt solid #444 !important;
   }
 
-  .entry-grid-2 {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 6pt !important;
-    font-size: 9pt !important;
+  .ledger-table th, .ledger-table td {
+    border: 1pt solid #888 !important;
+    padding: 6pt 8pt !important;
   }
 }

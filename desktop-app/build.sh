@@ -32,12 +32,8 @@ echo -n "APPL????" > "$APP_BUNDLE/Contents/PkgInfo"
 # 5. Copy Web Application files into bundle
 echo "==> Bundling web assets..."
 cp "$ROOT_DIR/index.html" "$APP_BUNDLE/Contents/Resources/web/"
-cp "$ROOT_DIR/css/app.css" "$APP_BUNDLE/Contents/Resources/web/css/"
-cp "$ROOT_DIR/css/print.css" "$APP_BUNDLE/Contents/Resources/web/css/"
-cp "$ROOT_DIR/js/bigbook-data.js" "$APP_BUNDLE/Contents/Resources/web/js/"
-cp "$ROOT_DIR/js/store.js" "$APP_BUNDLE/Contents/Resources/web/js/"
-cp "$ROOT_DIR/js/inventory-forms.js" "$APP_BUNDLE/Contents/Resources/web/js/"
-cp "$ROOT_DIR/js/app.js" "$APP_BUNDLE/Contents/Resources/web/js/"
+cp -R "$ROOT_DIR/css/"* "$APP_BUNDLE/Contents/Resources/web/css/"
+cp -R "$ROOT_DIR/js/"* "$APP_BUNDLE/Contents/Resources/web/js/"
 
 # 6. Compile native Cocoa/WebKit binary (Universal: arm64 + x86_64)
 echo "==> Compiling native Cocoa/WebKit executable with clang (Universal arm64 + x86_64)..."

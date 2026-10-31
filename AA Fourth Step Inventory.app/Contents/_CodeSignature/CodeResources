@@ -10,19 +10,19 @@
 		</data>
 		<key>Resources/web/css/app.css</key>
 		<data>
-		F+HlnazwdB23ksyaWW5gYu31HQw=
+		blNsGsSIhPAANviNFQ59aYZYynA=
 		</data>
 		<key>Resources/web/css/print.css</key>
 		<data>
-		8Os3Z1DnKypNMPOcr6aQaKg9MjI=
+		DLUdcMfi0XwuG8ZkSHT9Z6YeOTg=
 		</data>
 		<key>Resources/web/index.html</key>
 		<data>
-		D4UNqvYx7jiSG0w0PNi1/8tvs4o=
+		qsuVRxAW3cKQOBYZAyC71sNntXI=
 		</data>
 		<key>Resources/web/js/app.js</key>
 		<data>
-		rGuNBw4xJYIWd6Fghvbt3MUuhSs=
+		Ghh3bFZdp16ygT5tX7vgnM4QL/I=
 		</data>
 		<key>Resources/web/js/bigbook-data.js</key>
 		<data>
@@ -30,7 +30,11 @@
 		</data>
 		<key>Resources/web/js/inventory-forms.js</key>
 		<data>
-		2/5XUcJAftMblHHUojgH3fcksNY=
+		D8Mj99FG20l4y+iVRE6JXWCT2DY=
+		</data>
+		<key>Resources/web/js/sound-service.js</key>
+		<data>
+		QzZ+PqU8ifCimw+2m3Ig9Ywevh0=
 		</data>
 		<key>Resources/web/js/store.js</key>
 		<data>
@@ -50,28 +54,28 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			6x3n55eJ3nTN1UbSgHZd49M5RbZyVcBqMycD3OUi8Wo=
+			TaTHmu7EtCYJgdxA5ZYe1YM02eXrUD+FIVewNwrYkDM=
 			</data>
 		</dict>
 		<key>Resources/web/css/print.css</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			xte6c98n9z+/yAErDuVsPyJJty7+JuljoLAxUtPYe7c=
+			XnctKzFHYFrghky6BLkBfKVnY9KF+mrqrm8vis8tFE4=
 			</data>
 		</dict>
 		<key>Resources/web/index.html</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			TW6YY6ndeOsbYbAEiAADQdX1ynGvy6TW0Xn3YmLxlJ4=
+			zXt+Fem7cP4sS0VCmZ6yFLi3p77L7/OEraN26ybJ4ZM=
 			</data>
 		</dict>
 		<key>Resources/web/js/app.js</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			8Q8Ha/kjWfHw+2LeP+u/4c8iBwZ3HNBI0e/e/ZjTaeY=
+			xqRpvqSuZk3EEe4g8ubgECkFY9pgI1hkrG6cHGXI6Oc=
 			</data>
 		</dict>
 		<key>Resources/web/js/bigbook-data.js</key>
@@ -85,7 +89,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			jteqT3mkBHUeVuvNZLmWK1BZ4+cRPVwg0+6dzzHoYvg=
+			UqIQFPFH8Aow6LPTo243PNRQKMkTjwkcGMikKGpVffY=
+			</data>
+		</dict>
+		<key>Resources/web/js/sound-service.js</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			5WNEJVu9DdhZpGFPaHcLl6HmkHrdTG6DId+tZc/vZ90=
 			</data>
 		</dict>
 		<key>Resources/web/js/store.js</key>

@@ -1,21 +1,32 @@
 /**
- * Form builders, Wizard step transitions, and Modal Managers
- * for Resentments, Fears, Sex Conduct, and Harms.
+ * Guided Inventory Forms & Interactive Wizards
+ * Reimagined for maximum empathy, clarity, and intuitive spiritual discovery.
  */
 
 const InventoryForms = {
-  currentModalType: null,
-  currentEditingId: null,
-  currentWizardStep: 1,
+  currentStep: 1,
+  currentId: null,
+  activeFormData: null,
 
-  // --- RESENTMENT MODAL (4 COLUMNS) ---
-  openResentmentModal(id = null) {
-    this.currentModalType = 'resentment';
-    this.currentEditingId = id;
-    this.currentWizardStep = 1;
+  escape(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  },
 
-    let data = {
-      target: '',
+  // =========================================================================
+  // 1. RESENTMENT WIZARD (The 4 Columns Made Truly Intuitive)
+  // =========================================================================
+  openResentmentModal(id = null, prefillTarget = '') {
+    this.currentId = id;
+    this.currentStep = 1;
+
+    let d = {
+      target: prefillTarget || '',
       category: 'Person',
       cause: '',
       affects: [],
@@ -26,291 +37,332 @@ const InventoryForms = {
       myPart: '',
       oppositeAsset: '',
       amendsNeeded: false,
-      amendsNotes: ''
+      amendsNotes: '',
+      startPrayer: true
     };
 
     if (id) {
       const existing = window.inventoryStore.state.resentments.find(r => r.id === id);
       if (existing) {
-        data = { ...existing };
+        d = { ...existing };
+        if (d.affects && !Array.isArray(d.affects)) d.affects = [];
       }
     }
 
-    const modalTitle = id ? 'Edit Resentment' : 'New Resentment (The Four Columns)';
-    const contentHtml = `
-      <div class="wizard-header">
-        <div class="wizard-steps">
-          <button type="button" class="wizard-step-btn active" data-step="1">1. Who / What</button>
-          <button type="button" class="wizard-step-btn" data-step="2">2. The Cause</button>
-          <button type="button" class="wizard-step-btn" data-step="3">3. Affects My</button>
-          <button type="button" class="wizard-step-btn" data-step="4">4. The Turnaround</button>
-          <button type="button" class="wizard-step-btn" data-step="5">5. Sick Man Prayer</button>
-        </div>
-      </div>
+    this.activeFormData = d;
+    this.renderResentmentStep(1);
+  },
 
-      <form id="resentmentForm" class="inventory-form">
-        <!-- STEP 1: Column 1 -->
-        <div class="wizard-pane active" data-step="1">
-          <div class="form-banner">
-            <strong>Column 1 (Big Book p. 65):</strong> "In dealing with resentments, we set them on paper. We listed people, institutions or principles with whom we were angry."
+  renderResentmentStep(step) {
+    this.currentStep = step;
+    const d = this.activeFormData;
+    const title = this.currentId ? 'Edit Resentment' : 'Guided Resentment Inventory';
+
+    const stepsNav = `
+      <div class="wizard-progress-bar">
+        <button type="button" class="wizard-step-node ${step === 1 ? 'active' : (step > 1 ? 'done' : '')}" onclick="InventoryForms.renderResentmentStep(1)">1. Who</button>
+        <button type="button" class="wizard-step-node ${step === 2 ? 'active' : (step > 2 ? 'done' : '')}" onclick="InventoryForms.renderResentmentStep(2)">2. Cause</button>
+        <button type="button" class="wizard-step-node ${step === 3 ? 'active' : (step > 3 ? 'done' : '')}" onclick="InventoryForms.renderResentmentStep(3)">3. Hurt Areas</button>
+        <button type="button" class="wizard-step-node ${step === 4 ? 'active' : (step > 4 ? 'done' : '')}" onclick="InventoryForms.renderResentmentStep(4)">4. Turnaround</button>
+        <button type="button" class="wizard-step-node ${step === 5 ? 'active' : (step > 5 ? 'done' : '')}" onclick="InventoryForms.renderResentmentStep(5)">5. Freedom</button>
+      </div>
+    `;
+
+    let stepHtml = '';
+
+    if (step === 1) {
+      stepHtml = `
+        <div class="wizard-pane">
+          <div class="hero-quote mb-3">
+            "In dealing with resentments, we set them on paper. We listed people, institutions or principles with whom we were angry." (p. 64)
           </div>
 
-          <div class="form-group">
-            <label for="resTarget">I am resentful at: <span class="required">*</span></label>
-            <input type="text" id="resTarget" name="target" class="form-control" required placeholder="e.g. Mr. Brown, Mother, Ex-Spouse, Police, Church, My Employer, Myself" value="${this.escape(data.target)}">
-            <div class="quick-picks-row mt-1">
-              <span class="quick-pick-label">Quick select:</span>
-              <button type="button" class="quick-pick-btn" onclick="document.getElementById('resTarget').value='Mother'">Mother</button>
-              <button type="button" class="quick-pick-btn" onclick="document.getElementById('resTarget').value='Father'">Father</button>
-              <button type="button" class="quick-pick-btn" onclick="document.getElementById('resTarget').value='Employer'">Employer</button>
-              <button type="button" class="quick-pick-btn" onclick="document.getElementById('resTarget').value='Ex-Spouse'">Ex-Spouse</button>
-              <button type="button" class="quick-pick-btn" onclick="document.getElementById('resTarget').value='Myself'">Myself</button>
-              <button type="button" class="quick-pick-btn" onclick="document.getElementById('resTarget').value='God'">God</button>
+          <div class="form-group mb-3">
+            <label class="pref-label">Who or what are you angry at / resentful towards? <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="wizardTarget" class="dump-input" style="width:100%; border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:0.65rem 0.85rem;" placeholder="e.g. Mr. Brown, Mother, Employer, Ex-Partner, Myself, God" value="${this.escape(d.target)}" required autofocus>
+
+            <div class="dump-quick-tags mt-2">
+              <span class="tag-label">Quick select:</span>
+              <button type="button" class="quick-chip" onclick="document.getElementById('wizardTarget').value='Mother'">Mother</button>
+              <button type="button" class="quick-chip" onclick="document.getElementById('wizardTarget').value='Father'">Father</button>
+              <button type="button" class="quick-chip" onclick="document.getElementById('wizardTarget').value='My Employer'">My Employer</button>
+              <button type="button" class="quick-chip" onclick="document.getElementById('wizardTarget').value='Ex-Partner'">Ex-Partner</button>
+              <button type="button" class="quick-chip" onclick="document.getElementById('wizardTarget').value='Myself'">Myself</button>
+              <button type="button" class="quick-chip" onclick="document.getElementById('wizardTarget').value='God / Religion'">God</button>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="resCategory">Category:</label>
-            <select id="resCategory" name="category" class="form-control">
-              <option value="Person" ${data.category === 'Person' ? 'selected' : ''}>Person</option>
-              <option value="Family Member" ${data.category === 'Family Member' ? 'selected' : ''}>Family Member</option>
-              <option value="Employer / Workplace" ${data.category === 'Employer / Workplace' ? 'selected' : ''}>Employer / Workplace</option>
-              <option value="Institution / Authority" ${data.category === 'Institution / Authority' ? 'selected' : ''}>Institution / Authority / Government</option>
-              <option value="Religion / God" ${data.category === 'Religion / God' ? 'selected' : ''}>Religion / God</option>
-              <option value="Principle / Concept" ${data.category === 'Principle / Concept' ? 'selected' : ''}>Principle / Concept / Law</option>
-              <option value="Myself" ${data.category === 'Myself' ? 'selected' : ''}>Myself</option>
+          <div class="form-group mb-3">
+            <label class="pref-label">Category</label>
+            <select id="wizardCategory" class="select-pill" style="width:100%; padding:0.6rem 0.85rem;">
+              <option value="Person" ${d.category === 'Person' ? 'selected' : ''}>Person (Friend, Acquaintance)</option>
+              <option value="Family Member" ${d.category === 'Family Member' ? 'selected' : ''}>Family Member</option>
+              <option value="Employer / Workplace" ${d.category === 'Employer / Workplace' ? 'selected' : ''}>Employer / Workplace / Career</option>
+              <option value="Institution / Authority" ${d.category === 'Institution / Authority' ? 'selected' : ''}>Institution / Law / Government</option>
+              <option value="Religion / God" ${d.category === 'Religion / God' ? 'selected' : ''}>Religion / God</option>
+              <option value="Principle / Concept" ${d.category === 'Principle / Concept' ? 'selected' : ''}>Principle / Concept / Society</option>
+              <option value="Myself" ${d.category === 'Myself' ? 'selected' : ''}>Myself</option>
             </select>
           </div>
         </div>
-
-        <!-- STEP 2: Column 2 -->
-        <div class="wizard-pane" data-step="2">
-          <div class="form-banner">
-            <strong>Column 2 (Big Book p. 65):</strong> "We asked ourselves why we were angry." State the specific injury, slight, betrayal, or offense.
+      `;
+    } else if (step === 2) {
+      stepHtml = `
+        <div class="wizard-pane">
+          <div class="hero-quote mb-3">
+            "We asked ourselves why we were angry." (p. 65)
           </div>
 
-          <div class="form-group">
-            <label for="resCause">The Cause (What happened?): <span class="required">*</span></label>
-            <textarea id="resCause" name="cause" class="form-control" rows="4" required placeholder="Describe specifically what they did or said (e.g. 'Broke promise to pay back loan; criticized me in public; neglected my emotional needs; fired me without explanation').">${this.escape(data.cause)}</textarea>
-            <div class="form-hint">State the bare facts simply and directly. Avoid writing a novel or justifying yourself.</div>
+          <div class="form-group mb-3">
+            <label class="pref-label">The Cause: What specifically did <strong>${this.escape(d.target || 'they')}</strong> do or say?</label>
+            <textarea id="wizardCause" class="turnaround-textarea" rows="4" placeholder="Describe the concrete actions, words, or broken promises that hurt or angered you.">${this.escape(d.cause)}</textarea>
+            <p class="pref-desc mt-1">Keep it simple and factual. State what happened without needing to write a novel.</p>
+
+            <div class="dump-quick-tags mt-2">
+              <span class="tag-label">Common prompts:</span>
+              <button type="button" class="quick-chip" onclick="AppUI.appendWizardCause('Broke promise and lied to me. ')">Broke Promise</button>
+              <button type="button" class="quick-chip" onclick="AppUI.appendWizardCause('Criticized and disrespected me in front of others. ')">Criticized Me</button>
+              <button type="button" class="quick-chip" onclick="AppUI.appendWizardCause('Tried to control and micromanage my life. ')">Tried to Control</button>
+              <button type="button" class="quick-chip" onclick="AppUI.appendWizardCause('Abandoned and rejected me when I needed them. ')">Rejection</button>
+              <button type="button" class="quick-chip" onclick="AppUI.appendWizardCause('Treated me unfairly and took credit for my work. ')">Unfair Treatment</button>
+            </div>
           </div>
         </div>
-
-        <!-- STEP 3: Column 3 -->
-        <div class="wizard-pane" data-step="3">
-          <div class="form-banner">
-            <strong>Column 3 (Big Book p. 65):</strong> "In most cases it was found that our self-esteem, our pocketbooks, our ambitions, our personal relationships (including sex) were hurt or threatened."
+      `;
+    } else if (step === 3) {
+      stepHtml = `
+        <div class="wizard-pane">
+          <div class="hero-quote mb-3">
+            "In most cases it was found that our self-esteem, our pocketbooks, our ambitions, our personal relationships (including sex) were hurt or threatened." (p. 65)
           </div>
 
-          <label class="section-label">Check every instinctive area that felt wounded or threatened:</label>
-          <div class="checkbox-grid">
-            ${BIG_BOOK_DATA.glossary.instincts.map(inst => `
-              <label class="checkbox-card">
-                <input type="checkbox" name="affects" value="${inst.id}" ${data.affects.includes(inst.id) ? 'checked' : ''}>
-                <div class="card-text">
-                  <strong>${inst.name}</strong>
-                  <span>${inst.description}</span>
-                  <small class="prompt-hint">${inst.question}</small>
+          <label class="pref-label">Tap every part of you that felt wounded, threatened, or insulted:</label>
+          <div class="interactive-instinct-grid">
+            ${BIG_BOOK_DATA.glossary.instincts.map(inst => {
+              const isSelected = Array.isArray(d.affects) && d.affects.includes(inst.id);
+              const iconMap = {
+                self_esteem: '🪞',
+                pride: '👑',
+                pocketbook: '💳',
+                security: '🔒',
+                ambitions: '🎯',
+                personal_relationships: '🫂',
+                sex_relations: '💔'
+              };
+              return `
+                <div class="instinct-choice-card ${isSelected ? 'selected' : ''}" onclick="InventoryForms.toggleInstinctChoice('${inst.id}', this)">
+                  <div class="choice-icon">${iconMap[inst.id] || '⚡'}</div>
+                  <div class="choice-text">
+                    <strong>${inst.name}</strong>
+                    <span>${inst.description}</span>
+                  </div>
                 </div>
-              </label>
-            `).join('')}
+              `;
+            }).join('')}
           </div>
         </div>
-
-        <!-- STEP 4: Column 4 -->
-        <div class="wizard-pane" data-step="4">
-          <div class="form-banner alert-highlight">
-            <strong>Column 4: The Turnaround (p. 67):</strong> "Putting out of our minds the wrongs others had done, we resolutely looked for our own mistakes. Where had we been selfish, dishonest, self-seeking and frightened? Where were we to blame?"
+      `;
+    } else if (step === 4) {
+      stepHtml = `
+        <div class="wizard-pane">
+          <div class="hero-quote mb-3" style="color:var(--primary); font-weight:600;">
+            "Putting out of our minds the wrongs others had done, we resolutely looked for our own mistakes. Where had we been selfish, dishonest, self-seeking and frightened?" (p. 67)
           </div>
 
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label for="resSelfish">1. Where was I Selfish?</label>
-              <textarea id="resSelfish" name="selfish" class="form-control" rows="2" placeholder="What did I want regardless of anyone else?">${this.escape(data.selfish)}</textarea>
-              <div class="opposite-hint">🌿 <em>Asset:</em> Selfless, generous, considering others first.</div>
-            </div>
+          <p class="pref-desc mb-3">
+            Finding our part is <strong>not</strong> about blaming yourself for mistreatment. It is about identifying the character defects that are keeping <em>you</em> spiritually sick and finding the opposite spiritual virtue.
+          </p>
 
-            <div class="form-group">
-              <label for="resDishonest">2. Where was I Dishonest?</label>
-              <textarea id="resDishonest" name="dishonest" class="form-control" rows="2" placeholder="What lies, pretenses, or omissions was I fostering?">${this.escape(data.dishonest)}</textarea>
-              <div class="opposite-hint">🌿 <em>Asset:</em> Rigorous honesty, authenticity, admitting errors.</div>
+          <!-- 4 Character Defects & Spiritual Assets -->
+          <div class="turnaround-assistant-card ${d.selfish ? 'activated' : ''}">
+            <div class="turnaround-prompt-header">
+              <span class="turnaround-defect-name">1. Where was I Selfish?</span>
+              <span class="turnaround-asset-pill">🌿 Asset: Selfless & Generous</span>
             </div>
-
-            <div class="form-group">
-              <label for="resSelfSeeking">3. Where was I Self-Seeking?</label>
-              <textarea id="resSelfSeeking" name="selfSeeking" class="form-control" rows="2" placeholder="What was my hidden motive? How was I trying to control?">${this.escape(data.selfSeeking)}</textarea>
-              <div class="opposite-hint">🌿 <em>Asset:</em> Loving service, asking 'How can I help?'</div>
-            </div>
-
-            <div class="form-group">
-              <label for="resFrightened">4. Where was I Frightened?</label>
-              <textarea id="resFrightened" name="frightened" class="form-control" rows="2" placeholder="What fear was underneath? (Fear of loss, rejection, exposure?)">${this.escape(data.frightened)}</textarea>
-              <div class="opposite-hint">🌿 <em>Asset:</em> Faith in God, courage, spiritual reliance.</div>
-            </div>
+            <textarea id="wizardSelfish" class="turnaround-textarea" rows="2" placeholder="Where did I demand my own way, ignore their feelings, or put my wants first?">${this.escape(d.selfish)}</textarea>
           </div>
 
-          <div class="form-group">
-            <label for="resMyPart">Whose fault was it? / Where was I to blame? (My Mistakes):</label>
-            <textarea id="resMyPart" name="myPart" class="form-control" rows="3" placeholder="Disregarding the other person entirely: how did I set the ball rolling? What was my mistake in this situation?">${this.escape(data.myPart)}</textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="resOppositeAsset">Spiritual Principle / Asset to Cultivate:</label>
-            <input type="text" id="resOppositeAsset" name="oppositeAsset" class="form-control" placeholder="e.g. Unconditional forgiveness, honest communication, financial prudence" value="${this.escape(data.oppositeAsset || '')}">
-          </div>
-        </div>
-
-        <!-- STEP 5: Sick Man Prayer & Amends -->
-        <div class="wizard-pane" data-step="5">
-          <div class="prayer-box">
-            <div class="prayer-header-row">
-              <h4>The Freedom from Resentment Prayer (p. 67)</h4>
-              <button type="button" class="btn btn-xs btn-outline" onclick="window.soundService.playChime(432)">🔔 Ring Bell</button>
+          <div class="turnaround-assistant-card ${d.dishonest ? 'activated' : ''}">
+            <div class="turnaround-prompt-header">
+              <span class="turnaround-defect-name">2. Where was I Dishonest?</span>
+              <span class="turnaround-asset-pill">🌿 Asset: Rigorous Honesty & Truth</span>
             </div>
-            <p class="prayer-text">"This was our course: We realized that the people who wronged us were perhaps spiritually sick. Though we did not like their symptoms and the way these disturbed us, they, like ourselves, were sick too. We asked God to help us show them the same tolerance, pity, and patience that we would cheerfully grant a sick friend. When a person offended we said to ourselves: 'This is a sick person. How can I be helpful to him? God save me from being angry. Thy will be done.'"</p>
+            <textarea id="wizardDishonest" class="turnaround-textarea" rows="2" placeholder="Where was I hiding the truth, pretending, making false promises, or lying to myself?">${this.escape(d.dishonest)}</textarea>
+          </div>
+
+          <div class="turnaround-assistant-card ${d.selfSeeking ? 'activated' : ''}">
+            <div class="turnaround-prompt-header">
+              <span class="turnaround-defect-name">3. Where was I Self-Seeking?</span>
+              <span class="turnaround-asset-pill">🌿 Asset: Loving Service & Surrender</span>
+            </div>
+            <textarea id="wizardSelfSeeking" class="turnaround-textarea" rows="2" placeholder="What was my hidden motive? How was I trying to control, manipulate, or extract?">${this.escape(d.selfSeeking)}</textarea>
+          </div>
+
+          <div class="turnaround-assistant-card ${d.frightened ? 'activated' : ''}">
+            <div class="turnaround-prompt-header">
+              <span class="turnaround-defect-name">4. Where was I Frightened?</span>
+              <span class="turnaround-asset-pill">🌿 Asset: Courage & Faith in God</span>
+            </div>
+            <textarea id="wizardFrightened" class="turnaround-textarea" rows="2" placeholder="What was I afraid of losing or failing to get?">${this.escape(d.frightened)}</textarea>
           </div>
 
           <div class="form-group mt-3">
-            <label class="checkbox-card">
-              <input type="checkbox" id="resAmendsNeeded" name="amendsNeeded" ${data.amendsNeeded ? 'checked' : ''}>
-              <div class="card-text">
-                <strong>Did I harm this person / Do I owe amends in Steps 8 & 9?</strong>
-                <span>Flagging this person will automatically highlight them for your Step 8/9 Amends list.</span>
-              </div>
+            <label class="pref-label">Disregarding the other person entirely, what was my mistake? (Setting the ball rolling):</label>
+            <textarea id="wizardMyPart" class="turnaround-textarea" rows="3" placeholder="In black and white: how did I set the ball rolling? What was my mistake here?">${this.escape(d.myPart)}</textarea>
+          </div>
+
+          <div class="form-group mt-3">
+            <label class="pref-label">Spiritual Asset / Principle to Live By Today:</label>
+            <input type="text" id="wizardOppositeAsset" class="dump-input" style="width:100%; border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:0.6rem 0.85rem;" placeholder="e.g. Unconditional forgiveness, honest communication, financial diligence" value="${this.escape(d.oppositeAsset)}">
+          </div>
+        </div>
+      `;
+    } else if (step === 5) {
+      stepHtml = `
+        <div class="wizard-pane">
+          <div class="sick-prayer-recitation mb-3">
+            <div style="font-weight:700; color:var(--gold); margin-bottom:0.35rem;">The Freedom From Resentment Prayer (p. 67):</div>
+            "We realized that the people who wronged us were perhaps spiritually sick... When a person offended we said to ourselves: 'This is a sick person. How can I be helpful to him? God save me from being angry. Thy will be done.'"
+          </div>
+
+          <div class="pref-section">
+            <label class="pref-label">Begin 14-Day Resentment Freedom Prayer?</label>
+            <p class="pref-desc">Pray for ${this.escape(d.target || 'this person')} for 14 days asking for everything you want for yourself to be given to them. This will add them to your 14-Day Sanctuary tracker.</p>
+            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+              <input type="checkbox" id="wizardStartPrayer" ${d.startPrayer !== false ? 'checked' : ''} style="width:18px; height:18px;">
+              <span style="font-weight:600; font-size:0.9rem;">Yes, track 14-Day Freedom Prayer for ${this.escape(d.target || 'this person')}</span>
             </label>
           </div>
 
-          <div class="form-group" id="amendsNotesGroup" style="${data.amendsNeeded ? '' : 'display: none;'}">
-            <label for="resAmendsNotes">Amends Notes / Harms Done:</label>
-            <textarea id="resAmendsNotes" name="amendsNotes" class="form-control" rows="2" placeholder="What harm did I cause, and what kind of amends might be needed (sincere apology, financial restitution, changed behavior)?">${this.escape(data.amendsNotes)}</textarea>
-          </div>
-        </div>
+          <div class="pref-section">
+            <label class="pref-label">Did you harm this person / Do you owe amends in Steps 8 & 9?</label>
+            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; margin-bottom:0.5rem;">
+              <input type="checkbox" id="wizardAmendsNeeded" ${d.amendsNeeded ? 'checked' : ''} onchange="document.getElementById('wizardAmendsNotesWrap').style.display = this.checked ? 'block' : 'none';" style="width:18px; height:18px;">
+              <span style="font-weight:600; font-size:0.9rem;">Yes, I harmed them and need to make amends</span>
+            </label>
 
-        <!-- Navigation Controls -->
-        <div class="modal-footer">
-          <div class="footer-left">
-            <button type="button" class="btn btn-secondary" id="btnWizardPrev" style="display: none;">← Previous</button>
-          </div>
-          <div class="footer-right">
-            <button type="button" class="btn btn-secondary" id="btnModalCancel">Cancel</button>
-            <button type="button" class="btn btn-primary" id="btnWizardNext">Next →</button>
-            <button type="submit" class="btn btn-accent" id="btnWizardSubmit" style="display: none;">Save Resentment</button>
+            <div id="wizardAmendsNotesWrap" style="${d.amendsNeeded ? '' : 'display:none;'}">
+              <textarea id="wizardAmendsNotes" class="turnaround-textarea" rows="2" placeholder="What harm did you cause, and what restitution is appropriate?">${this.escape(d.amendsNotes)}</textarea>
+            </div>
           </div>
         </div>
-      </form>
+      `;
+    }
+
+    const footerNav = `
+      <div class="card-footer mt-4" style="border-top:1px solid var(--border-color); padding-top:1rem;">
+        <div>
+          ${step > 1 ? `<button type="button" class="btn btn-secondary" onclick="InventoryForms.navigateResentmentStep(-1)">← Previous</button>` : ''}
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+          <button type="button" class="btn btn-outline" onclick="AppUI.closeModal()">Cancel</button>
+          ${step < 5 ? `<button type="button" class="btn btn-primary" onclick="InventoryForms.navigateResentmentStep(1)">Next Step →</button>` : `<button type="button" class="btn btn-accent" onclick="InventoryForms.saveResentment()">Save Resentment</button>`}
+        </div>
+      </div>
     `;
 
-    AppUI.showModal(modalTitle, contentHtml);
-    this.setupResentmentFormListeners(id);
+    const html = stepsNav + stepHtml + footerNav;
+    AppUI.showModal(title, html);
   },
 
-  setupResentmentFormListeners(id) {
-    const form = document.getElementById('resentmentForm');
-    const stepBtns = document.querySelectorAll('.wizard-step-btn');
-    const panes = document.querySelectorAll('.wizard-pane');
-    const btnPrev = document.getElementById('btnWizardPrev');
-    const btnNext = document.getElementById('btnWizardNext');
-    const btnSubmit = document.getElementById('btnWizardSubmit');
-    const btnCancel = document.getElementById('btnModalCancel');
-    const amendsCheck = document.getElementById('resAmendsNeeded');
-    const amendsNotesGroup = document.getElementById('amendsNotesGroup');
+  syncCurrentStepInputs() {
+    const d = this.activeFormData;
+    if (!d) return;
 
-    amendsCheck.addEventListener('change', (e) => {
-      amendsNotesGroup.style.display = e.target.checked ? 'block' : 'none';
-    });
+    if (this.currentStep === 1) {
+      const t = document.getElementById('wizardTarget');
+      const c = document.getElementById('wizardCategory');
+      if (t) d.target = t.value.trim();
+      if (c) d.category = c.value;
+    } else if (this.currentStep === 2) {
+      const c = document.getElementById('wizardCause');
+      if (c) d.cause = c.value.trim();
+    } else if (this.currentStep === 4) {
+      const s = document.getElementById('wizardSelfish');
+      const dis = document.getElementById('wizardDishonest');
+      const ss = document.getElementById('wizardSelfSeeking');
+      const f = document.getElementById('wizardFrightened');
+      const p = document.getElementById('wizardMyPart');
+      const a = document.getElementById('wizardOppositeAsset');
 
-    const updateStep = (newStep) => {
-      this.currentWizardStep = newStep;
-      stepBtns.forEach(btn => {
-        btn.classList.toggle('active', parseInt(btn.dataset.step) === newStep);
-      });
-      panes.forEach(pane => {
-        pane.classList.toggle('active', parseInt(pane.dataset.step) === newStep);
-      });
+      if (s) d.selfish = s.value.trim();
+      if (dis) d.dishonest = dis.value.trim();
+      if (ss) d.selfSeeking = ss.value.trim();
+      if (f) d.frightened = f.value.trim();
+      if (p) d.myPart = p.value.trim();
+      if (a) d.oppositeAsset = a.value.trim();
+    } else if (this.currentStep === 5) {
+      const sp = document.getElementById('wizardStartPrayer');
+      const am = document.getElementById('wizardAmendsNeeded');
+      const an = document.getElementById('wizardAmendsNotes');
 
-      btnPrev.style.display = newStep > 1 ? 'inline-flex' : 'none';
-      if (newStep === 5) {
-        btnNext.style.display = 'none';
-        btnSubmit.style.display = 'inline-flex';
-      } else {
-        btnNext.style.display = 'inline-flex';
-        btnSubmit.style.display = 'none';
-      }
-    };
-
-    stepBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        updateStep(parseInt(btn.dataset.step));
-      });
-    });
-
-    btnNext.addEventListener('click', () => {
-      if (this.currentWizardStep < 5) {
-        if (this.currentWizardStep === 1) {
-          const target = document.getElementById('resTarget').value.trim();
-          if (!target) {
-            alert('Please specify who or what you are resentful at.');
-            return;
-          }
-        }
-        if (this.currentWizardStep === 2) {
-          const cause = document.getElementById('resCause').value.trim();
-          if (!cause) {
-            alert('Please describe the cause of your resentment.');
-            return;
-          }
-        }
-        updateStep(this.currentWizardStep + 1);
-      }
-    });
-
-    btnPrev.addEventListener('click', () => {
-      if (this.currentWizardStep > 1) {
-        updateStep(this.currentWizardStep - 1);
-      }
-    });
-
-    btnCancel.addEventListener('click', () => AppUI.closeModal());
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
-      const affects = Array.from(form.querySelectorAll('input[name="affects"]:checked')).map(el => el.value);
-
-      const payload = {
-        target: formData.get('target').trim(),
-        category: formData.get('category'),
-        cause: formData.get('cause').trim(),
-        affects: affects,
-        selfish: formData.get('selfish').trim(),
-        dishonest: formData.get('dishonest').trim(),
-        selfSeeking: formData.get('selfSeeking').trim(),
-        frightened: formData.get('frightened').trim(),
-        myPart: formData.get('myPart').trim(),
-        oppositeAsset: formData.get('oppositeAsset') ? formData.get('oppositeAsset').trim() : '',
-        amendsNeeded: amendsCheck.checked,
-        amendsNotes: formData.get('amendsNotes') ? formData.get('amendsNotes').trim() : ''
-      };
-
-      if (id) {
-        window.inventoryStore.updateResentment(id, payload);
-      } else {
-        window.inventoryStore.addResentment(payload);
-      }
-
-      window.soundService.playChime(528);
-      AppUI.closeModal();
-      AppUI.showToast(id ? 'Resentment updated.' : 'Resentment added to inventory.');
-    });
+      if (sp) d.startPrayer = sp.checked;
+      if (am) d.amendsNeeded = am.checked;
+      if (an) d.amendsNotes = an.value.trim();
+    }
   },
 
-  // --- FEAR MODAL (pp. 67-68) ---
-  openFearModal(id = null) {
-    this.currentModalType = 'fear';
-    this.currentEditingId = id;
+  navigateResentmentStep(delta) {
+    this.syncCurrentStepInputs();
 
-    let data = {
-      fear: '',
+    if (delta > 0 && this.currentStep === 1 && !this.activeFormData.target) {
+      alert('Please enter a person, institution, or principle for Column 1.');
+      return;
+    }
+
+    const next = this.currentStep + delta;
+    if (next >= 1 && next <= 5) {
+      this.renderResentmentStep(next);
+    }
+  },
+
+  toggleInstinctChoice(id, element) {
+    const d = this.activeFormData;
+    if (!Array.isArray(d.affects)) d.affects = [];
+
+    const idx = d.affects.indexOf(id);
+    if (idx === -1) {
+      d.affects.push(id);
+      element.classList.add('selected');
+    } else {
+      d.affects.splice(idx, 1);
+      element.classList.remove('selected');
+    }
+  },
+
+  saveResentment() {
+    this.syncCurrentStepInputs();
+    const d = this.activeFormData;
+
+    if (!d.target) {
+      alert('Please enter who you are resentful towards.');
+      this.renderResentmentStep(1);
+      return;
+    }
+
+    if (this.currentId) {
+      window.inventoryStore.updateItem('resentments', this.currentId, d);
+      AppUI.showToast(`Updated resentment: ${d.target}`);
+    } else {
+      if (d.startPrayer && !d.prayerDaysCompleted) {
+        d.prayerDaysCompleted = new Array(14).fill(false);
+      }
+      window.inventoryStore.addItem('resentments', d);
+      AppUI.showToast(`Added resentment: ${d.target}`);
+    }
+
+    window.soundService.playChime(432);
+    AppUI.closeModal();
+    AppUI.render();
+  },
+
+  // =========================================================================
+  // 2. FEAR INVENTORY MODAL
+  // =========================================================================
+  openFearModal(id = null, prefillFear = '') {
+    this.currentId = id;
+    let d = {
+      fear: prefillFear || '',
       why: '',
       affects: [],
       selfReliancePart: '',
@@ -319,107 +371,84 @@ const InventoryForms = {
 
     if (id) {
       const existing = window.inventoryStore.state.fears.find(f => f.id === id);
-      if (existing) {
-        data = { ...existing };
-      }
+      if (existing) d = { ...existing };
     }
 
-    const modalTitle = id ? 'Edit Fear' : 'New Fear Inventory (pp. 67-68)';
-    const contentHtml = `
-      <form id="fearForm" class="inventory-form">
-        <div class="form-banner">
-          <strong>Big Book pp. 67-68:</strong> "We reviewed our fears thoroughly. We put them on paper, even though we had no resentment in connection with them. We asked ourselves why we had them. Wasn't it because self-reliance failed us?"
+    const title = id ? 'Edit Fear' : 'Reviewing Our Fears (pp. 67–68)';
+    const html = `
+      <form onsubmit="InventoryForms.saveFear(event)">
+        <div class="hero-quote mb-3">
+          "We reviewed our fears thoroughly. We put them on paper, even though we had no resentment in connection with them.
+          We asked ourselves why we had them. Wasn't it because self-reliance failed us?" (pp. 67–68)
         </div>
 
-        <div class="form-group">
-          <label for="fearName">What is the fear? <span class="required">*</span></label>
-          <input type="text" id="fearName" name="fear" class="form-control" required placeholder="e.g. Financial ruin, Dying alone, Being exposed as a fraud, Being unloved, Public speaking" value="${this.escape(data.fear)}">
-          <div class="quick-picks-row mt-1">
-            <span class="quick-pick-label">Common fears:</span>
-            <button type="button" class="quick-pick-btn" onclick="document.getElementById('fearName').value='Financial Insecurity / Poverty'">Poverty</button>
-            <button type="button" class="quick-pick-btn" onclick="document.getElementById('fearName').value='Rejection & Being Alone'">Rejection</button>
-            <button type="button" class="quick-pick-btn" onclick="document.getElementById('fearName').value='Illness & Death'">Illness</button>
-            <button type="button" class="quick-pick-btn" onclick="document.getElementById('fearName').value='What People Think of Me'">Judgment</button>
-            <button type="button" class="quick-pick-btn" onclick="document.getElementById('fearName').value='Failure & Incompetence'">Failure</button>
+        <div class="form-group mb-3">
+          <label class="pref-label">What is the fear? <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="fearInput" class="dump-input" style="width:100%; border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:0.65rem 0.85rem;" placeholder="e.g. Financial ruin, being rejected, being exposed as inadequate, illness" value="${this.escape(d.fear)}" required autofocus>
+        </div>
+
+        <div class="form-group mb-3">
+          <label class="pref-label">Why do I have it? (Where did self-reliance fail?):</label>
+          <textarea id="fearWhy" class="turnaround-textarea" rows="3" placeholder="Why does this terrify me? Did I rely purely on self, money, or ego instead of spiritual trust?">${this.escape(d.why)}</textarea>
+        </div>
+
+        <div class="form-group mb-3">
+          <label class="pref-label">What parts of self are threatened?</label>
+          <div class="dump-quick-tags">
+            ${['Self-Esteem', 'Security', 'Finances (Pocketbook)', 'Ambitions', 'Personal Relationships'].map(label => `
+              <label class="quick-chip" style="cursor:pointer;">
+                <input type="checkbox" name="fearAffects" value="${label}" ${(d.affects || []).includes(label) ? 'checked' : ''}> ${label}
+              </label>
+            `).join('')}
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="fearWhy">Why do I have it? (Where did self-reliance fail?): <span class="required">*</span></label>
-          <textarea id="fearWhy" name="why" class="form-control" rows="3" required placeholder="Why does this fear grip me? Did I believe I had to control life on my own willpower?">${this.escape(data.why)}</textarea>
+        <div class="form-group mb-3">
+          <label class="pref-label">The Fear Prayer & Spiritual Asset:</label>
+          <textarea id="fearPrayerPractice" class="turnaround-textarea" rows="2" placeholder="We ask Him to remove our fear and direct our attention to what He would have us be...">${this.escape(d.prayerPractice || 'We ask God to remove this fear and direct our attention to what He would have us be: courageous, humble, and useful to others.')}</textarea>
         </div>
 
-        <label class="section-label">What areas of life does this fear affect?</label>
-        <div class="checkbox-grid">
-          ${BIG_BOOK_DATA.glossary.instincts.map(inst => `
-            <label class="checkbox-card">
-              <input type="checkbox" name="affects" value="${inst.id}" ${data.affects.includes(inst.id) ? 'checked' : ''}>
-              <div class="card-text">
-                <strong>${inst.name}</strong>
-              </div>
-            </label>
-          `).join('')}
-        </div>
-
-        <div class="form-group mt-3">
-          <label for="fearSelfReliance">Self-Reliance vs. God-Reliance (Our Mistake):</label>
-          <textarea id="fearSelfReliance" name="selfReliancePart" class="form-control" rows="3" placeholder="How did relying on my own finite ego fail to solve this fear?">${this.escape(data.selfReliancePart)}</textarea>
-        </div>
-
-        <div class="prayer-box mt-3">
-          <h4>The Big Book Fear Prayer (p. 68)</h4>
-          <p class="prayer-text">"We ask Him to remove our fear and direct our attention to what He would have us be. At once, we commence to outgrow fear."</p>
-        </div>
-
-        <div class="form-group mt-3">
-          <label for="fearPrayerPractice">Spiritual Turnaround (What would God have me be?):</label>
-          <textarea id="fearPrayerPractice" name="prayerPractice" class="form-control" rows="2" placeholder="Instead of living in this fear, what would God have me be? (e.g. Faithful, trustful, courageous, helpful to others).">${this.escape(data.prayerPractice)}</textarea>
-        </div>
-
-        <div class="modal-footer">
-          <div class="footer-left"></div>
-          <div class="footer-right">
-            <button type="button" class="btn btn-secondary" onclick="AppUI.closeModal()">Cancel</button>
-            <button type="submit" class="btn btn-accent">Save Fear</button>
+        <div class="card-footer mt-4" style="border-top:1px solid var(--border-color); padding-top:1rem;">
+          <div></div>
+          <div style="display:flex; gap:0.5rem;">
+            <button type="button" class="btn btn-outline" onclick="AppUI.closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Fear</button>
           </div>
         </div>
       </form>
     `;
 
-    AppUI.showModal(modalTitle, contentHtml);
-
-    const form = document.getElementById('fearForm');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
-      const affects = Array.from(form.querySelectorAll('input[name="affects"]:checked')).map(el => el.value);
-
-      const payload = {
-        fear: formData.get('fear').trim(),
-        why: formData.get('why').trim(),
-        affects: affects,
-        selfReliancePart: formData.get('selfReliancePart').trim(),
-        prayerPractice: formData.get('prayerPractice').trim()
-      };
-
-      if (id) {
-        window.inventoryStore.updateFear(id, payload);
-      } else {
-        window.inventoryStore.addFear(payload);
-      }
-
-      window.soundService.playChime(528);
-      AppUI.closeModal();
-      AppUI.showToast(id ? 'Fear updated.' : 'Fear added to inventory.');
-    });
+    AppUI.showModal(title, html);
   },
 
-  // --- SEX CONDUCT MODAL (pp. 68-70) ---
-  openSexConductModal(id = null) {
-    this.currentModalType = 'sexConduct';
-    this.currentEditingId = id;
+  saveFear(e) {
+    e.preventDefault();
+    const fear = document.getElementById('fearInput').value.trim();
+    const why = document.getElementById('fearWhy').value.trim();
+    const prayerPractice = document.getElementById('fearPrayerPractice').value.trim();
+    const checkboxes = document.querySelectorAll('input[name="fearAffects"]:checked');
+    const affects = Array.from(checkboxes).map(c => c.value);
 
-    let data = {
+    const item = { fear, why, prayerPractice, affects };
+
+    if (this.currentId) {
+      window.inventoryStore.updateItem('fears', this.currentId, item);
+      AppUI.showToast(`Updated fear`);
+    } else {
+      window.inventoryStore.addItem('fears', item);
+      AppUI.showToast(`Added fear`);
+    }
+
+    AppUI.closeModal();
+    AppUI.render();
+  },
+
+  // =========================================================================
+  // 3. SEX & INTIMACY MODAL
+  // =========================================================================
+  openSexConductModal(id = null) {
+    this.currentId = id;
+    let d = {
       person: '',
       selfish: '',
       dishonest: '',
@@ -429,244 +458,158 @@ const InventoryForms = {
       whereAtFault: '',
       whatShouldHaveDone: '',
       soundSaneIdeal: '',
-      willingAmends: ''
+      willingAmends: 'Yes'
     };
 
     if (id) {
       const existing = window.inventoryStore.state.sexConduct.find(s => s.id === id);
-      if (existing) {
-        data = { ...existing };
-      }
+      if (existing) d = { ...existing };
     }
 
-    const modalTitle = id ? 'Edit Sex Conduct Entry' : 'New Sex Conduct & Relationships Inventory (pp. 68-70)';
-    const contentHtml = `
-      <form id="sexForm" class="inventory-form">
-        <div class="form-banner">
-          <strong>Big Book pp. 68-70:</strong> "Now about sex. Many of us needed an overhauling there. But above all, we tried to be sensible on this subject... We reviewed our own past conduct over the years."
+    const title = id ? 'Edit Relationship Review' : 'Sex Conduct & Intimacy (pp. 68–70)';
+    const html = `
+      <form onsubmit="InventoryForms.saveSexConduct(event)">
+        <div class="hero-quote mb-3">
+          "We subjected each relation to this test: was it selfish or not? We asked God to mold our ideals and help us to live up to them." (p. 69)
         </div>
 
-        <div class="form-group">
-          <label for="sexPerson">Person / Relationship: <span class="required">*</span></label>
-          <input type="text" id="sexPerson" name="person" class="form-control" required placeholder="Name of partner, spouse, or person involved" value="${this.escape(data.person)}">
+        <div class="form-group mb-3">
+          <label class="pref-label">Person / Partner:</label>
+          <input type="text" id="sexPerson" class="dump-input" style="width:100%; border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:0.65rem 0.85rem;" placeholder="e.g. Former partner, spouse, person involved with" value="${this.escape(d.person)}" required autofocus>
         </div>
 
-        <div class="form-grid-2">
-          <div class="form-group">
-            <label for="sexSelfish">1. Where had we been selfish?</label>
-            <textarea id="sexSelfish" name="selfish" class="form-control" rows="2" placeholder="Used them for sex, comfort, ego?">${this.escape(data.selfish)}</textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="sexDishonest">2. Where had we been dishonest?</label>
-            <textarea id="sexDishonest" name="dishonest" class="form-control" rows="2" placeholder="Lies, broken vows, secret affairs, false feelings?">${this.escape(data.dishonest)}</textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="sexInconsiderate">3. Where had we been inconsiderate?</label>
-            <textarea id="sexInconsiderate" name="inconsiderate" class="form-control" rows="2" placeholder="Disregarded their feelings or emotional safety?">${this.escape(data.inconsiderate)}</textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="sexHurt">4. Whom had we hurt?</label>
-            <textarea id="sexHurt" name="hurt" class="form-control" rows="2" placeholder="The partner, their family, children, our self-respect?">${this.escape(data.hurt)}</textarea>
-          </div>
+        <div class="form-group mb-3">
+          <label class="pref-label">Where had we been selfish, dishonest, or inconsiderate?</label>
+          <textarea id="sexSelfish" class="turnaround-textarea" rows="2" placeholder="Where did I put my wants, validation, or impulses ahead of their dignity?">${this.escape(d.selfish)}</textarea>
         </div>
 
-        <div class="form-group">
-          <label for="sexJealousy">5. Did we unjustifiably arouse jealousy, suspicion or bitterness?</label>
-          <textarea id="sexJealousy" name="jealousy" class="form-control" rows="2" placeholder="Mind games, secrecy, flirtatious manipulation?">${this.escape(data.jealousy)}</textarea>
+        <div class="form-group mb-3">
+          <label class="pref-label">Whom had we hurt? Did we arouse jealousy or suspicion?</label>
+          <textarea id="sexHurt" class="turnaround-textarea" rows="2" placeholder="What damage was caused to them, family, children, or third parties?">${this.escape(d.hurt)}</textarea>
         </div>
 
-        <div class="form-grid-2">
-          <div class="form-group">
-            <label for="sexWhereAtFault">6. Where were we at fault?</label>
-            <textarea id="sexWhereAtFault" name="whereAtFault" class="form-control" rows="2" placeholder="My exact mistakes in this relationship">${this.escape(data.whereAtFault)}</textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="sexWhatShouldHaveDone">7. What should we have done instead?</label>
-            <textarea id="sexWhatShouldHaveDone" name="whatShouldHaveDone" class="form-control" rows="2" placeholder="Honesty, respect, healthy boundaries, clean separation?">${this.escape(data.whatShouldHaveDone)}</textarea>
-          </div>
+        <div class="form-group mb-3">
+          <label class="pref-label">What should we have done instead?</label>
+          <textarea id="sexShouldHaveDone" class="turnaround-textarea" rows="2" placeholder="How should an honest, sane spiritual person have handled this?">${this.escape(d.whatShouldHaveDone)}</textarea>
         </div>
 
-        <div class="form-group">
-          <label for="sexSoundSaneIdeal">8. Developing a Sound & Sane Ideal for the Future (p. 69):</label>
-          <textarea id="sexSoundSaneIdeal" name="soundSaneIdeal" class="form-control" rows="2" placeholder="What is our ideal for relationship and sexual conduct? (e.g. Unselfish, honest, spiritual, mutually supportive)">${this.escape(data.soundSaneIdeal)}</textarea>
+        <div class="form-group mb-3">
+          <label class="pref-label">Our Sound and Sane Ideal for Relationships Today:</label>
+          <textarea id="sexIdeal" class="turnaround-textarea" rows="2" placeholder="Describe the ideal relationship: built on mutual respect, trust, spiritual purpose, and love.">${this.escape(d.soundSaneIdeal)}</textarea>
         </div>
 
-        <div class="form-group">
-          <label for="sexWillingAmends">9. Willingness to Make Amends (Steps 8 & 9):</label>
-          <textarea id="sexWillingAmends" name="willingAmends" class="form-control" rows="2" placeholder="Are we willing to repair damage, provided it does not harm them or others?">${this.escape(data.willingAmends)}</textarea>
-        </div>
-
-        <div class="modal-footer">
-          <div class="footer-left"></div>
-          <div class="footer-right">
-            <button type="button" class="btn btn-secondary" onclick="AppUI.closeModal()">Cancel</button>
-            <button type="submit" class="btn btn-accent">Save Sex Conduct Entry</button>
+        <div class="card-footer mt-4" style="border-top:1px solid var(--border-color); padding-top:1rem;">
+          <div></div>
+          <div style="display:flex; gap:0.5rem;">
+            <button type="button" class="btn btn-outline" onclick="AppUI.closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Relationship</button>
           </div>
         </div>
       </form>
     `;
 
-    AppUI.showModal(modalTitle, contentHtml);
-
-    const form = document.getElementById('sexForm');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
-
-      const payload = {
-        person: formData.get('person').trim(),
-        selfish: formData.get('selfish').trim(),
-        dishonest: formData.get('dishonest').trim(),
-        inconsiderate: formData.get('inconsiderate').trim(),
-        hurt: formData.get('hurt').trim(),
-        jealousy: formData.get('jealousy').trim(),
-        whereAtFault: formData.get('whereAtFault').trim(),
-        whatShouldHaveDone: formData.get('whatShouldHaveDone').trim(),
-        soundSaneIdeal: formData.get('soundSaneIdeal').trim(),
-        willingAmends: formData.get('willingAmends').trim()
-      };
-
-      if (id) {
-        window.inventoryStore.updateSexConduct(id, payload);
-      } else {
-        window.inventoryStore.addSexConduct(payload);
-      }
-
-      window.soundService.playChime(528);
-      AppUI.closeModal();
-      AppUI.showToast(id ? 'Sex conduct entry updated.' : 'Sex conduct entry saved.');
-    });
+    AppUI.showModal(title, html);
   },
 
-  // --- HARMS MODAL (Step 8 prep) ---
-  openHarmModal(id = null) {
-    this.currentModalType = 'harm';
-    this.currentEditingId = id;
+  saveSexConduct(e) {
+    e.preventDefault();
+    const item = {
+      person: document.getElementById('sexPerson').value.trim(),
+      selfish: document.getElementById('sexSelfish').value.trim(),
+      hurt: document.getElementById('sexHurt').value.trim(),
+      whatShouldHaveDone: document.getElementById('sexShouldHaveDone').value.trim(),
+      soundSaneIdeal: document.getElementById('sexIdeal').value.trim()
+    };
 
-    let data = {
+    if (this.currentId) {
+      window.inventoryStore.updateItem('sexConduct', this.currentId, item);
+      AppUI.showToast('Updated relationship review');
+    } else {
+      window.inventoryStore.addItem('sexConduct', item);
+      AppUI.showToast('Added relationship review');
+    }
+
+    AppUI.closeModal();
+    AppUI.render();
+  },
+
+  // =========================================================================
+  // 4. HARMS TO OTHERS MODAL
+  // =========================================================================
+  openHarmModal(id = null) {
+    this.currentId = id;
+    let d = {
       person: '',
       description: '',
       financialHarm: false,
       financialAmount: '',
-      emotionalHarm: true,
       restitutionPlan: '',
       willingness: 'Willing'
     };
 
     if (id) {
       const existing = window.inventoryStore.state.harms.find(h => h.id === id);
-      if (existing) {
-        data = { ...existing };
-      }
+      if (existing) d = { ...existing };
     }
 
-    const modalTitle = id ? 'Edit Harm Entry' : 'New Harm to Others (Pre-Step 8)';
-    const contentHtml = `
-      <form id="harmForm" class="inventory-form">
-        <div class="form-banner">
-          <strong>Harms Inventory:</strong> Beyond resentments and sex conduct, list other people or institutions you harmed (through theft, unpaid debts, broken promises, negligence, or slander) to prepare for Steps 8 and 9.
+    const title = id ? 'Edit Person Harmed' : 'Harms to Others (Steps 8 & 9 Prep)';
+    const html = `
+      <form onsubmit="InventoryForms.saveHarm(event)">
+        <div class="form-group mb-3">
+          <label class="pref-label">Person or Institution Harmed:</label>
+          <input type="text" id="harmPerson" class="dump-input" style="width:100%; border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:0.65rem 0.85rem;" placeholder="e.g. My brother, former boss, neighbor, bank" value="${this.escape(d.person)}" required autofocus>
         </div>
 
-        <div class="form-group">
-          <label for="harmPerson">Person or Institution Harmed: <span class="required">*</span></label>
-          <input type="text" id="harmPerson" name="person" class="form-control" required placeholder="e.g. Landlord, Former business partner, Old friend, Credit card company" value="${this.escape(data.person)}">
+        <div class="form-group mb-3">
+          <label class="pref-label">What was the harm or wrong done?</label>
+          <textarea id="harmDescription" class="turnaround-textarea" rows="3" placeholder="Describe the theft, betrayal, slander, neglected obligation, or damage.">${this.escape(d.description)}</textarea>
         </div>
 
-        <div class="form-group">
-          <label for="harmDesc">Description of Harm: <span class="required">*</span></label>
-          <textarea id="harmDesc" name="description" class="form-control" rows="3" required placeholder="What specifically did I do to harm or cheat them?">${this.escape(data.description)}</textarea>
+        <div class="form-group mb-3">
+          <label class="pref-label">Restitution Plan / Amends Idea:</label>
+          <textarea id="harmRestitution" class="turnaround-textarea" rows="2" placeholder="What can be done to right this wrong? (Direct apology, repayment, living amends)"></textarea>
         </div>
 
-        <div class="form-grid-2">
-          <div class="form-group">
-            <label class="checkbox-card">
-              <input type="checkbox" id="harmFinCheck" name="financialHarm" ${data.financialHarm ? 'checked' : ''}>
-              <div class="card-text">
-                <strong>Financial / Property Harm</strong>
-                <span>Money stolen, unpaid debts, damaged property</span>
-              </div>
-            </label>
-          </div>
-
-          <div class="form-group" id="harmAmountGroup" style="${data.financialHarm ? '' : 'display: none;'}">
-            <label for="harmAmount">Amount or Property description:</label>
-            <input type="text" id="harmAmount" name="financialAmount" class="form-control" placeholder="e.g. $500 unpaid rent" value="${this.escape(data.financialAmount)}">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="harmRestitution">Restitution / Amends Plan:</label>
-          <textarea id="harmRestitution" name="restitutionPlan" class="form-control" rows="2" placeholder="What restitution or direct amends is necessary when ready?">${this.escape(data.restitutionPlan)}</textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="harmWillingness">Current Willingness (Step 8):</label>
-          <select id="harmWillingness" name="willingness" class="form-control">
-            <option value="Willing" ${data.willingness === 'Willing' ? 'selected' : ''}>Willing to make amends</option>
-            <option value="Willing to become willing" ${data.willingness === 'Willing to become willing' ? 'selected' : ''}>Willing to become willing (need prayer / sponsor help)</option>
-            <option value="Hesitant / Unsure" ${data.willingness === 'Hesitant / Unsure' ? 'selected' : ''}>Hesitant / Unsure (fear of consequences)</option>
-            <option value="Direct amends would injure them" ${data.willingness === 'Direct amends would injure them' ? 'selected' : ''}>Direct amends would injure them or others (living amends only)</option>
+        <div class="form-group mb-3">
+          <label class="pref-label">Current Willingness:</label>
+          <select id="harmWillingness" class="select-pill" style="width:100%; padding:0.6rem 0.85rem;">
+            <option value="Willing" ${d.willingness === 'Willing' ? 'selected' : ''}>Willing to make amends promptly</option>
+            <option value="Hesitant" ${d.willingness === 'Hesitant' ? 'selected' : ''}>Hesitant / Need sponsor guidance first</option>
+            <option value="Completed" ${d.willingness === 'Completed' ? 'selected' : ''}>Amends already completed</option>
           </select>
         </div>
 
-        <div class="modal-footer">
-          <div class="footer-left"></div>
-          <div class="footer-right">
-            <button type="button" class="btn btn-secondary" onclick="AppUI.closeModal()">Cancel</button>
-            <button type="submit" class="btn btn-accent">Save Harm</button>
+        <div class="card-footer mt-4" style="border-top:1px solid var(--border-color); padding-top:1rem;">
+          <div></div>
+          <div style="display:flex; gap:0.5rem;">
+            <button type="button" class="btn btn-outline" onclick="AppUI.closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Harm Record</button>
           </div>
         </div>
       </form>
     `;
 
-    AppUI.showModal(modalTitle, contentHtml);
-
-    const form = document.getElementById('harmForm');
-    const finCheck = document.getElementById('harmFinCheck');
-    const amountGroup = document.getElementById('harmAmountGroup');
-
-    finCheck.addEventListener('change', (e) => {
-      amountGroup.style.display = e.target.checked ? 'block' : 'none';
-    });
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
-
-      const payload = {
-        person: formData.get('person').trim(),
-        description: formData.get('description').trim(),
-        financialHarm: finCheck.checked,
-        financialAmount: formData.get('financialAmount') ? formData.get('financialAmount').trim() : '',
-        restitutionPlan: formData.get('restitutionPlan').trim(),
-        willingness: formData.get('willingness')
-      };
-
-      if (id) {
-        window.inventoryStore.updateHarm(id, payload);
-      } else {
-        window.inventoryStore.addHarm(payload);
-      }
-
-      window.soundService.playChime(528);
-      AppUI.closeModal();
-      AppUI.showToast(id ? 'Harm entry updated.' : 'Harm entry saved.');
-    });
+    AppUI.showModal(title, html);
   },
 
-  escape(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+  saveHarm(e) {
+    e.preventDefault();
+    const item = {
+      person: document.getElementById('harmPerson').value.trim(),
+      description: document.getElementById('harmDescription').value.trim(),
+      restitutionPlan: document.getElementById('harmRestitution').value.trim(),
+      willingness: document.getElementById('harmWillingness').value
+    };
+
+    if (this.currentId) {
+      window.inventoryStore.updateItem('harms', this.currentId, item);
+      AppUI.showToast('Updated harm entry');
+    } else {
+      window.inventoryStore.addItem('harms', item);
+      AppUI.showToast('Added harm entry');
+    }
+
+    AppUI.closeModal();
+    AppUI.render();
   }
 };
-
-window.InventoryForms = InventoryForms;
